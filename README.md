@@ -1,6 +1,32 @@
 # Nexa
 
-## tips
+
+
+## Tips
+
+
+
+### Commit 格式规范
+
+> 参考文章 [Commit message 和 Change log 编写指南](https://www.ruanyifeng.com/blog/2016/01/commit_message_change_log.html)
+
+```
+[<type>](<scope>) <subject> (#pr)
+docs：                   文档变动
+fix：                    bug 修复
+feat：                   新增功能
+feat-wip：               开发中的功能，比如某功能的部分代码。
+improvement：            原有功能的优化和改进
+style：                  代码风格调整
+typo：                   代码或文档勘误
+refactor：               代码重构（不涉及功能变动）
+performance/optimize：   性能优化
+test：                   单元测试的添加或修复
+chore：                  构建工具的修改
+revert：                 回滚
+deps：                   第三方依赖库的修改
+community：              社区相关的修改，如修改 Github Issue 模板等。
+```
 
 ### 拉取依赖仓库
 
