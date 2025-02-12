@@ -1,0 +1,9 @@
+serverAddr = "123.57.18.139"
+serverPort = 22345
+
+[[proxies]]
+name = "AMMETER"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 25732
+remotePort = 25732
