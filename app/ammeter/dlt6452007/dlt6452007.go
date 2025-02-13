@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"io"
 
-	"orba.plus/nexa/pkg/pool"
+	"nexis.run/nexa/pkg/pool"
 )
 
 var (

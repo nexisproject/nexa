@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"orba.plus/nexa/pkg/dump"
+	"nexis.run/nexa/pkg/dump"
 )
 
 func TestParse(t *testing.T) {

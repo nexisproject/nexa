@@ -7,7 +7,7 @@ package logger
 import (
 	"github.com/segmentio/kafka-go"
 
-	"orba.plus/nexa/pkg/clara"
+	"nexis.run/nexa/pkg/clara"
 )
 
 type KafkaWriter struct {

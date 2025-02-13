@@ -10,7 +10,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"orba.plus/nexa/pkg/pool"
+	"nexis.run/nexa/pkg/pool"
 )
 
 type Data struct {

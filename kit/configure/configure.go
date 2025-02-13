@@ -10,7 +10,7 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
 
-	"orba.plus/nexa/kit"
+	"nexis.run/nexa/kit"
 )
 
 type Configure struct {

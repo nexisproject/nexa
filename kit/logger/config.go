@@ -4,7 +4,7 @@
 
 package logger
 
-import "orba.plus/nexa/kit"
+import "nexis.run/nexa/kit"
 
 type Config struct {
 	// Name 日志名称

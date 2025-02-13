@@ -10,8 +10,8 @@ import (
 
 	"github.com/panjf2000/gnet/v2"
 
-	"orba.plus/nexa/app/ammeter"
-	"orba.plus/nexa/pkg/dump"
+	"nexis.run/nexa/app/ammeter"
+	"nexis.run/nexa/pkg/dump"
 )
 
 // 数据包定义

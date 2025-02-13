@@ -7,10 +7,10 @@ package shrmdq
 import (
 	"fmt"
 
-	"orba.plus/nexa/app/ammeter"
-	"orba.plus/nexa/app/ammeter/dlt6452007"
-	"orba.plus/nexa/pkg/convert"
-	"orba.plus/nexa/pkg/silk"
+	"nexis.run/nexa/app/ammeter"
+	"nexis.run/nexa/app/ammeter/dlt6452007"
+	"nexis.run/nexa/pkg/convert"
+	"nexis.run/nexa/pkg/silk"
 )
 
 type Message interface {

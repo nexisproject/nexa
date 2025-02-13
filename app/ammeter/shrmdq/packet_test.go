@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"orba.plus/nexa/app/ammeter/dlt6452007"
+	"nexis.run/nexa/app/ammeter/dlt6452007"
 )
 
 func TestPacket_Decode(t *testing.T) {

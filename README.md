@@ -35,12 +35,12 @@ community：              社区相关的修改，如修改 Github Issue 模板�
 git config --global url."git@gitlab.liasica.com:".insteadof "https://gitlab.liasica.com/"
 
 # 设置环境变量
-go env -w GOPRIVATE="orba.plus"
-go env -w GONOPROXY="orba.plus"
-go env -w GONOSUMDB="orba.plus"
+go env -w GOPRIVATE="nexis.run"
+go env -w GONOPROXY="nexis.run"
+go env -w GONOSUMDB="nexis.run"
 
 # 安装依赖
-go get -u -v orba.plus/nexa
+go get -u -v nexis.run/nexa
 ```
 
 ### 防止静态检查工具误报

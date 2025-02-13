@@ -1,4 +1,4 @@
-module orba.plus/nexa
+module nexis.run/nexa
 
 go 1.23.0
 

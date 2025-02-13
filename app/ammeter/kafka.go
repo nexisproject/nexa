@@ -10,7 +10,7 @@ import (
 	"github.com/segmentio/kafka-go"
 	"go.uber.org/zap"
 
-	"orba.plus/nexa/pkg/clara"
+	"nexis.run/nexa/pkg/clara"
 )
 
 const (

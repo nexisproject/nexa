@@ -9,8 +9,8 @@ import (
 
 	"go.uber.org/zap"
 
-	"orba.plus/nexa/app/ammeter"
-	"orba.plus/nexa/pkg/channel"
+	"nexis.run/nexa/app/ammeter"
+	"nexis.run/nexa/pkg/channel"
 )
 
 const (

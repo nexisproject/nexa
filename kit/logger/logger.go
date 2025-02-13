@@ -8,8 +8,8 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"orba.plus/nexa/kit/configure"
-	"orba.plus/nexa/pkg/clara"
+	"nexis.run/nexa/kit/configure"
+	"nexis.run/nexa/pkg/clara"
 )
 
 func Setup(cfg *configure.Logger) {

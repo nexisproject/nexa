@@ -9,7 +9,7 @@ import (
 
 	"github.com/panjf2000/gnet/v2"
 
-	"orba.plus/nexa/pkg/dump"
+	"nexis.run/nexa/pkg/dump"
 )
 
 type Client struct {

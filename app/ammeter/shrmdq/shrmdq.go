@@ -10,9 +10,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"orba.plus/nexa/app/ammeter"
-	"orba.plus/nexa/app/ammeter/dlt6452007"
-	"orba.plus/nexa/pkg/channel"
+	"nexis.run/nexa/app/ammeter"
+	"nexis.run/nexa/app/ammeter/dlt6452007"
+	"nexis.run/nexa/pkg/channel"
 )
 
 type Shrmdq struct {

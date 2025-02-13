@@ -10,8 +10,8 @@ import (
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 
-	"orba.plus/nexa/app/ammeter"
-	"orba.plus/nexa/app/ammeter/shrmdq"
+	"nexis.run/nexa/app/ammeter"
+	"nexis.run/nexa/app/ammeter/shrmdq"
 )
 
 func main() {
