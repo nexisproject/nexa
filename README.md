@@ -31,13 +31,39 @@ community：              社区相关的修改，如修改 Github Issue 模板�
 ### 拉取依赖仓库
 
 ```shell
-# 使用ssh替换https
+# 添加脚本（仅需添加一次）
+cat <<'EOF' > /usr/local/bin/append-go-env
+#!/bin/bash
+
+function join() {
+    local IFS="$1"
+    shift
+    echo "$*"
+}
+
+function append() {
+  arr=()
+  IFS=',' read -r -a arr <<< "$(go env "$1")"
+  arr+=("$2")
+  #arr=($(echo "${arr[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
+  read -r -a arr <<< "$(echo "${arr[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')"
+  str=$(join , "${arr[@]}")
+  go env -w "$1=$str"
+  go env "$1"
+}
+
+append "$@"
+EOF
+
+chmod +x /usr/local/bin/append-go-env
+
+# 使用ssh替换https（仅需设置一次）
 git config --global url."git@gitlab.liasica.com:".insteadof "https://gitlab.liasica.com/"
 
-# 设置环境变量
-go env -w GOPRIVATE="nexis.run"
-go env -w GONOPROXY="nexis.run"
-go env -w GONOSUMDB="nexis.run"
+# 设置环境变量（仅需设置一次）
+append-go-env GOPRIVATE "nexis.run"
+append-go-env GONOPROXY "nexis.run"
+append-go-env GONOSUMDB "nexis.run"
 
 # 安装依赖
 go get -u -v nexis.run/nexa
