@@ -40,15 +40,7 @@ func (c *Clara) NewReader(topic, groupID string) *Reader {
 
 func (c *Clara) Listen(topic, groupID string, cb MessageListener) error {
 	// 创建Reader
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  c.addresses,
-		Topic:    topic,
-		GroupID:  groupID,
-		MaxBytes: 10e6, // 10MB
-		// https://github.com/segmentio/kafka-go/issues/800#issuecomment-981855523
-		WatchPartitionChanges:  true,
-		PartitionWatchInterval: time.Second * 5,
-	})
+	r := c.NewReader(topic, groupID)
 	// r.SetOffset(42) // 设置Offset
 
 	// 接收消息

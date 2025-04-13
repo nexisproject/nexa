@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+
+	"nexis.run/nexa/kit/configure"
 )
 
 func TestLogger(t *testing.T) {
@@ -22,4 +24,19 @@ func TestLogger(t *testing.T) {
 	require.NoError(t, err)
 	ld.Info("test")
 	ld.Named("xtest").Info("test")
+
+	Setup(&configure.Logger{
+		Name:   "test-log",
+		Stdout: true,
+		Kafka: &configure.LoggerKafka{
+			Topic: "applog",
+			Addresses: []string{
+				"10.10.10.200:32420",
+				"10.10.10.200:32421",
+				"10.10.10.200:32422",
+			},
+		},
+	})
+
+	zap.L().Info("KAFKA test")
 }

@@ -21,5 +21,5 @@ func TestLoad(t *testing.T) {
 	require.NotNil(t, c)
 
 	require.Equal(t, "v1.0.0", c.Version)
-	require.Equal(t, "test-app", c.Name)
+	require.Equal(t, "test-app", c.AppName)
 }

@@ -26,11 +26,11 @@ func Setup(cfg *configure.Logger) {
 	}
 
 	// 输出到kafka
-	if len(cfg.Kafka) > 0 {
+	if cfg.Kafka != nil {
 		prod := zap.NewProductionEncoderConfig()
 		prod.EncodeTime = zapcore.ISO8601TimeEncoder
 
-		w := NewKafkaWriter(clara.New(cfg.Kafka, clara.WithTopic(cfg.Name+"-log")))
+		w := NewKafkaWriter(clara.New(cfg.Kafka.Addresses, clara.WithTopic(cfg.Kafka.Topic)))
 		cores = append(
 			cores,
 			zapcore.NewCore(
@@ -41,7 +41,7 @@ func Setup(cfg *configure.Logger) {
 		)
 	}
 
-	l := zap.New(zapcore.NewTee(cores...), zap.AddCaller())
+	l := zap.New(zapcore.NewTee(cores...), zap.AddCaller()).Named(cfg.Name)
 
 	// 设置全局logger
 	zap.ReplaceGlobals(l)

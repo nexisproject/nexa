@@ -14,25 +14,19 @@ import (
 )
 
 type Configure struct {
-	Name        string
-	Environment kit.Environment
-	Logger      *Logger
-}
-
-type Logger struct {
-	Kafka  []string `koanf:"kafka"`  // 输出至kafka地址列表
-	Stdout bool     `koanf:"stdout"` // 是否输出到控制台
-	Name   string   `koanf:"name"`   // 日志名称
+	AppName     string          // 应用名称
+	Environment kit.Environment // 环境变量
+	Logger      *Logger         // 日志配置
 }
 
 type Configurable interface {
-	GetName() string
+	GetAppName() string
 	GetEnvironment() kit.Environment
 	GetLogger() *Logger
 }
 
-func (c Configure) GetName() string {
-	return c.Name
+func (c Configure) GetAppName() string {
+	return c.AppName
 }
 
 func (c Configure) GetEnvironment() kit.Environment {
@@ -41,6 +35,38 @@ func (c Configure) GetEnvironment() kit.Environment {
 
 func (c Configure) GetLogger() *Logger {
 	return c.Logger
+}
+
+type Logger struct {
+	Name string // 日志名称
+
+	Stdout bool // 是否输出到控制台
+
+	// 输出至kafka
+	Kafka *LoggerKafka
+}
+
+type LoggerKafka struct {
+	Topic     string
+	Addresses []string
+}
+
+func (l *Logger) IsVaild() (vaild bool) {
+	if l == nil {
+		return
+	}
+
+	// 如果没有配置kafka和stdout，返回false
+	if !l.Stdout && l.Kafka == nil {
+		return
+	}
+
+	// 如果配置了kafka，topic和name不能为空
+	if l.Kafka != nil {
+		return l.Kafka.Topic != "" && len(l.Kafka.Addresses) > 0 && l.Name != ""
+	}
+
+	return true
 }
 
 func Load[T Configurable](p string) (c T, err error) {
@@ -68,7 +94,7 @@ func Load[T Configurable](p string) (c T, err error) {
 		},
 	)
 
-	if c.GetName() == "" {
+	if c.GetAppName() == "" {
 		err = kit.ErrConfigMissName
 	}
 
