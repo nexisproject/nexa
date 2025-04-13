@@ -17,7 +17,11 @@ func Setup(cfg *configure.Logger) {
 
 	// 开发环境输出到控制台
 	if cfg.Stdout {
-		d, _ := zap.NewDevelopment()
+		d, err := zap.NewDevelopment()
+		if err != nil {
+			panic(err)
+		}
+
 		cores = append(cores, d.Core())
 	}
 
