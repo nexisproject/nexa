@@ -30,7 +30,7 @@ func TestLogger(t *testing.T) {
 		Stdout: true,
 		Kafka: &configure.LoggerKafka{
 			Topic: "applog",
-			Addresses: []string{
+			Brokers: []string{
 				"10.10.10.200:32420",
 				"10.10.10.200:32421",
 				"10.10.10.200:32422",

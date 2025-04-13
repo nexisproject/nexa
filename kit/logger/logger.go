@@ -30,7 +30,7 @@ func Setup(cfg *configure.Logger) {
 		prod := zap.NewProductionEncoderConfig()
 		prod.EncodeTime = zapcore.ISO8601TimeEncoder
 
-		w := NewKafkaWriter(clara.New(cfg.Kafka.Addresses, clara.WithTopic(cfg.Kafka.Topic)))
+		w := NewKafkaWriter(clara.New(cfg.Kafka.Brokers, clara.WithTopic(cfg.Kafka.Topic)))
 		cores = append(
 			cores,
 			zapcore.NewCore(
