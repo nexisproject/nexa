@@ -19,7 +19,10 @@ function append() {
   str=$(join , "${arr[@]}")
   #echo "$1=$str"
   go env -w "$1=$str"
-  go env "$1"
+  echo "$1=$(go env "$1")"
 }
 
-append "$@"
+append GOPRIVATE "$@"
+append GONOPROXY "$@"
+append GONOSUMDB "$@"
+

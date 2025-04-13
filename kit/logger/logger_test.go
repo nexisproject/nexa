@@ -7,15 +7,19 @@ package logger
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
 )
 
 func TestLogger(t *testing.T) {
-	l, _ := zap.NewProduction()
+	l, err := zap.NewProduction()
+	require.NoError(t, err)
 	l.Info("test")
 	l.Named("xtest").Info("test")
 
-	ld, _ := zap.NewDevelopment()
+	var ld *zap.Logger
+	ld, err = zap.NewDevelopment()
+	require.NoError(t, err)
 	ld.Info("test")
 	ld.Named("xtest").Info("test")
 }
