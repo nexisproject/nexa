@@ -4,7 +4,12 @@
 
 package clara
 
-import "time"
+import (
+	"time"
+
+	cmap "github.com/orcaman/concurrent-map/v2"
+	"github.com/segmentio/kafka-go"
+)
 
 const (
 	DefaultRetries = 3                      // 默认重试次数
@@ -13,23 +18,14 @@ const (
 )
 
 type Clara struct {
-	addresses []string      // kafka地址
-	topic     string        // topic
-	retries   int           // 重试次数
-	sleep     time.Duration // 重试间隔
-	timeout   time.Duration // 超时时间
+	addresses []string
+	writers   cmap.ConcurrentMap[string, *kafka.Writer]
 }
 
-func New(addresses []string, options ...Option) *Clara {
+func New(addresses []string) *Clara {
 	c := &Clara{
 		addresses: addresses,
-		retries:   DefaultRetries,
-		sleep:     DefaultSleep,
-		timeout:   DefaultTimeout,
-	}
-
-	for _, option := range options {
-		option.apply(c)
+		writers:   cmap.New[*kafka.Writer](),
 	}
 
 	return c
