@@ -5,27 +5,27 @@
 package clara
 
 import (
-	"time"
+	"strings"
 
 	cmap "github.com/orcaman/concurrent-map/v2"
-	"github.com/segmentio/kafka-go"
 )
 
-const (
-	DefaultRetries = 3                      // 默认重试次数
-	DefaultTimeout = 3 * time.Second        // 默认超时时间
-	DefaultSleep   = 250 * time.Millisecond // 默认重试间隔
-)
+var instances = cmap.New[*Clara]()
 
 type Clara struct {
-	addresses []string
-	writers   cmap.ConcurrentMap[string, *kafka.Writer]
+	brokers []string
+	writers cmap.ConcurrentMap[string, *Writer]
 }
 
-func New(addresses []string) *Clara {
+func New(brokers []string) *Clara {
+	key := strings.Join(brokers, ",")
+	if instance, exists := instances.Get(key); exists {
+		return instance
+	}
+
 	c := &Clara{
-		addresses: addresses,
-		writers:   cmap.New[*kafka.Writer](),
+		brokers: brokers,
+		writers: cmap.New[*Writer](),
 	}
 
 	return c

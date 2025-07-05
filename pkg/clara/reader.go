@@ -15,19 +15,24 @@ type Reader struct {
 	topic   string
 	groupID string
 
-	clara *Clara
-	*kafka.Reader
+	clara  *Clara
+	reader *kafka.Reader
 }
 
 type MessageListener func(message kafka.Message, err error) error
 
-func (c *Clara) NewReader(topic, groupID string) *Reader {
+var _ = NewReader
+
+// NewReader 创建一个新的Kafka Reader
+func NewReader(addresses []string, topic, groupID string) *Reader {
+	c := New(addresses)
+
 	return &Reader{
 		topic:   topic,
 		groupID: groupID,
 		clara:   c,
-		Reader: kafka.NewReader(kafka.ReaderConfig{
-			Brokers:  c.addresses,
+		reader: kafka.NewReader(kafka.ReaderConfig{
+			Brokers:  c.brokers,
 			Topic:    topic,
 			GroupID:  groupID,
 			MaxBytes: 10e6, // 10MB
@@ -38,14 +43,13 @@ func (c *Clara) NewReader(topic, groupID string) *Reader {
 	}
 }
 
-func (c *Clara) Listen(topic, groupID string, cb MessageListener) error {
-	// 创建Reader
-	r := c.NewReader(topic, groupID)
+// Listen 监听消息回调
+func (r *Reader) Listen(cb MessageListener) error {
 	// r.SetOffset(42) // 设置Offset
 
 	// 接收消息
 	for {
-		err := cb(r.ReadMessage(context.Background()))
+		err := cb(r.reader.ReadMessage(context.Background()))
 		if err != nil {
 			return err
 		}

@@ -12,32 +12,58 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func (c *Clara) NewWriter(topic string) *kafka.Writer {
+const (
+	DefaultRetries       = 3                      // 默认重试次数
+	DefaultTimeout       = 3 * time.Second        // 默认超时时间
+	DefaultRetryInterval = 250 * time.Millisecond // 默认重试间隔
+)
+
+type Writer struct {
+	*kafka.Writer
+
+	retries       int
+	retryInterval time.Duration
+	timeout       time.Duration
+}
+
+var _ = NewWriter
+
+func NewWriter(addresses []string, topic string, opts ...Option) *Writer {
+	c := New(addresses)
+
 	w, exists := c.writers.Get(topic)
 	if exists {
 		return w
 	}
 
-	w = &kafka.Writer{
-		Addr:                   kafka.TCP(c.addresses...),
-		RequiredAcks:           kafka.RequireAll, // ack模式
-		Topic:                  topic,
-		Async:                  true, // 异步
-		AllowAutoTopicCreation: true, // 自动创建topic
-		// Balancer:               &kafka.LeastBytes{}, // 指定分区的balancer模式为最小字节分布
+	w = &Writer{
+		Writer: &kafka.Writer{
+			Addr:                   kafka.TCP(c.brokers...),
+			RequiredAcks:           kafka.RequireAll, // ack模式
+			Topic:                  topic,
+			Async:                  true, // 异步
+			AllowAutoTopicCreation: true, // 自动创建topic
+			// Balancer:               &kafka.LeastBytes{}, // 指定分区的balancer模式为最小字节分布
+		},
+		retries:       DefaultRetries,
+		retryInterval: DefaultRetryInterval,
+		timeout:       DefaultTimeout,
 	}
+
+	for _, opt := range opts {
+		opt.apply(w)
+	}
+
 	c.writers.Set(topic, w)
 
 	return w
 }
 
-func (c *Clara) WriteMessages(topic string, messages ...kafka.Message) (err error) {
-	w := c.NewWriter(topic)
-
-	for i := 0; i < DefaultRetries; i++ {
-		err = c.writeMessagesWithTimeout(w, messages...)
+func (w *Writer) SendMessages(messages ...kafka.Message) (err error) {
+	for i := 0; i < w.retries; i++ {
+		err = w.writeMessagesWithTimeout(messages...)
 		if errors.Is(err, kafka.LeaderNotAvailable) || errors.Is(err, kafka.UnknownTopicOrPartition) || errors.Is(err, context.DeadlineExceeded) {
-			time.Sleep(DefaultSleep)
+			time.Sleep(DefaultRetryInterval)
 			continue
 		}
 
@@ -46,7 +72,7 @@ func (c *Clara) WriteMessages(topic string, messages ...kafka.Message) (err erro
 	return
 }
 
-func (c *Clara) writeMessagesWithTimeout(w *kafka.Writer, messages ...kafka.Message) (err error) {
+func (w *Writer) writeMessagesWithTimeout(messages ...kafka.Message) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 	defer cancel()
 

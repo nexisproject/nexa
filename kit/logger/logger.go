@@ -9,7 +9,6 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	"nexis.run/nexa/kit/configure"
-	"nexis.run/nexa/pkg/clara"
 )
 
 func Setup(cfg *configure.Logger) {
@@ -30,7 +29,7 @@ func Setup(cfg *configure.Logger) {
 		prod := zap.NewProductionEncoderConfig()
 		prod.EncodeTime = zapcore.ISO8601TimeEncoder
 
-		w := NewKafkaWriter(clara.New(cfg.Kafka.Brokers, clara.WithTopic(cfg.Kafka.Topic)))
+		w := NewKafkaWriter(cfg.Kafka.Brokers, cfg.Kafka.Topic)
 		cores = append(
 			cores,
 			zapcore.NewCore(

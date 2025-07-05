@@ -11,17 +11,17 @@ import (
 )
 
 type KafkaWriter struct {
-	*clara.Clara
+	*clara.Writer
 }
 
-func NewKafkaWriter(c *clara.Clara) *KafkaWriter {
+func NewKafkaWriter(brokers []string, topic string) *KafkaWriter {
 	return &KafkaWriter{
-		Clara: c,
+		Writer: clara.NewWriter(brokers, topic),
 	}
 }
 
 func (w *KafkaWriter) Write(p []byte) (n int, err error) {
-	err = w.WriteMessages(kafka.Message{
+	err = w.SendMessages(kafka.Message{
 		Value: p,
 	})
 	if err != nil {
