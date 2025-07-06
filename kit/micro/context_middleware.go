@@ -6,12 +6,9 @@ package micro
 
 import "context"
 
-type Context struct {
-	context.Context
-
-	Name string
-}
-
-func NewContext(name string) {
-
+func NewContext(app string) *Context {
+	return &Context{
+		Context: context.WithValue(context.Background(), "app", app),
+		App:     app,
+	}
 }

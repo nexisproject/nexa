@@ -20,15 +20,15 @@ type ContextWrapper interface {
 
 // Context Rest服务上下文
 type Context struct {
-	Name string
+	App string
 
 	echo.Context
 }
 
 // NewContext 创建上下文
-func NewContext(name string, c echo.Context) *Context {
+func NewContext(app string, c echo.Context) *Context {
 	return &Context{
-		Name:    name,
+		App:     app,
 		Context: c,
 	}
 }

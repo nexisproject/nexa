@@ -5,7 +5,6 @@
 package micro
 
 import (
-	"context"
 	"fmt"
 	"io"
 
@@ -24,12 +23,8 @@ var _ = Run
 
 type Handler func(s *grpc.Server)
 
-func Run(name, address string, h Handler) (server *grpc.Server, ch chan error) {
-
-	ctx := &Context{
-		Name:    name,
-		Context: context.WithValue(context.Background(), "name", name),
-	}
+func Run(app, address string, h Handler) (server *grpc.Server, ch chan error) {
+	ctx := NewContext(app)
 
 	server = grpc.NewServer(
 		grpc.Address(address),

@@ -8,10 +8,10 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func ContextMiddleware(name string) echo.MiddlewareFunc {
+func ContextMiddleware(app string) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return next(NewContext(name, c))
+			return next(NewContext(app, c))
 		}
 	}
 }

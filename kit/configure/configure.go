@@ -14,19 +14,19 @@ import (
 )
 
 type Configure struct {
-	AppName     string          // 应用名称
+	App         string          // 应用名称
 	Environment kit.Environment // 环境变量
 	Logger      *Logger         // 日志配置
 }
 
 type Configurable interface {
-	GetAppName() string
+	GetApp() string
 	GetEnvironment() kit.Environment
 	GetLogger() *Logger
 }
 
-func (c Configure) GetAppName() string {
-	return c.AppName
+func (c Configure) GetApp() string {
+	return c.App
 }
 
 func (c Configure) GetEnvironment() kit.Environment {
@@ -94,7 +94,7 @@ func Load[T Configurable](p string) (c T, err error) {
 		},
 	)
 
-	if c.GetAppName() == "" {
+	if c.GetApp() == "" {
 		err = kit.ErrConfigMissName
 	}
 

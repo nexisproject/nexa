@@ -18,7 +18,7 @@ var _ = Run
 
 type Handler func(e *echo.Echo)
 
-func Run(name, address string, h Handler) (e *echo.Echo, ch chan error) {
+func Run(app, address string, h Handler) (e *echo.Echo, ch chan error) {
 	e = echo.New()
 
 	// 隐藏banner
@@ -61,7 +61,7 @@ func Run(name, address string, h Handler) (e *echo.Echo, ch chan error) {
 
 	// 设置全局中间件
 	e.Use(
-		ContextMiddleware(name),
+		ContextMiddleware(app),
 		RecoverMiddleware(),
 	)
 
