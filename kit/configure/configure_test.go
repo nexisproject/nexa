@@ -22,4 +22,5 @@ func TestLoad(t *testing.T) {
 
 	require.Equal(t, "v1.0.0", c.Version)
 	require.Equal(t, "test-app", c.AppName)
+	require.Equal(t, true, c.GetLogger().Stdout)
 }

@@ -40,7 +40,12 @@ func Setup(cfg *configure.Logger) {
 		)
 	}
 
-	l := zap.New(zapcore.NewTee(cores...), zap.AddCaller()).Named(cfg.Name)
+	l := zap.New(zapcore.NewTee(cores...), zap.AddCaller())
+
+	// 如果配置了日志名称，则设置日志名称
+	if cfg.Name != "" {
+		l = l.Named(cfg.Name)
+	}
 
 	// 设置全局logger
 	zap.ReplaceGlobals(l)

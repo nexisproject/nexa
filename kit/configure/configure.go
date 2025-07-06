@@ -63,7 +63,7 @@ func (l *Logger) IsVaild() (vaild bool) {
 
 	// 如果配置了kafka，topic和name不能为空
 	if l.Kafka != nil {
-		return l.Kafka.Topic != "" && len(l.Kafka.Brokers) > 0 && l.Name != ""
+		return l.Kafka.Topic != "" && len(l.Kafka.Brokers) > 0
 	}
 
 	return true
