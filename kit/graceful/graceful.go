@@ -28,8 +28,16 @@ func (s *Server) Start() {}
 func (s *Server) Stop(_ context.Context) {}
 
 // Run 启动服务
-func Run(s Gracefully) {
-	ctx, stop := signal.NotifyContext(
+func Run(s Gracefully, opts ...Option) {
+	// 设置默认选项
+	o := &option{
+		timeout: 30 * time.Second, // 默认超时时间为30秒
+	}
+	for _, opt := range opts {
+		opt.apply(o)
+	}
+
+	notify, stop := signal.NotifyContext(
 		context.Background(),
 		os.Interrupt,
 		syscall.SIGHUP,
@@ -42,12 +50,16 @@ func Run(s Gracefully) {
 	// 启动服务
 	go s.Start()
 
-	// 当中断信号发生时，关闭服务器并返回 (20秒超时)
-	<-ctx.Done()
+	// 当中断信号发生时，关闭服务器并返回
+	<-notify.Done()
 
-	var cancel context.CancelFunc
-	ctx, cancel = context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
+	// 如果有设置超时时间，则使用该时间来优雅地关闭服务
+	ctx := context.Background()
+	if o.timeout > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, o.timeout)
+		defer cancel()
+	}
 
 	s.Stop(ctx)
 }
