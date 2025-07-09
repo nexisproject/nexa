@@ -212,7 +212,7 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 		fields := []zap.Field{
 			zap.String("method", c.Request().Method),
 			zap.String("url", c.Request().RequestURI),
-			zap.Bool("dump", true),
+			zap.Int8("dump", 1), // 1: 收到请求
 			zap.String("remote_addr", c.Request().RemoteAddr),
 		}
 
