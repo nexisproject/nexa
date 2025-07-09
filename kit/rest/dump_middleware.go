@@ -210,6 +210,8 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 		}
 
 		fields := []zap.Field{
+			zap.String("method", c.Request().Method),
+			zap.String("url", c.Request().RequestURI),
 			zap.Bool("dump", true),
 			zap.String("remote_addr", c.Request().RemoteAddr),
 		}
@@ -248,7 +250,7 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 		}
 
 		zap.L().Info(
-			"["+c.Request().Method+"] "+c.Request().RequestURI,
+			"DUMP",
 			fields...,
 		)
 	})
