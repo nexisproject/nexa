@@ -5,13 +5,25 @@
 package configure
 
 import (
+	"os"
+	"time"
+
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/knadh/koanf/v2"
+	"github.com/sony/sonyflake/v2"
 
 	"nexis.run/nexa/kit"
 )
+
+func init() {
+	// 设置全局时区
+	tz := "Asia/Shanghai"
+	_ = os.Setenv("TZ", tz)
+	loc, _ := time.LoadLocation(tz)
+	time.Local = loc
+}
 
 type Configure struct {
 	App         string          // 应用名称
@@ -107,4 +119,20 @@ func Load[T Configurable](p string) (c T, err error) {
 	}
 
 	return
+}
+
+// Sonyflake 创建sonyflake实例
+func (c Configure) Sonyflake() (*sonyflake.Sonyflake, error) {
+	id := 1103
+	switch c.Environment {
+	case kit.Production:
+		id = 1101
+	case kit.Development:
+		id = 1102
+	}
+	return sonyflake.New(sonyflake.Settings{
+		MachineID: func() (int, error) {
+			return id, nil
+		},
+	})
 }

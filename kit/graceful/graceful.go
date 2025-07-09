@@ -6,7 +6,6 @@ package graceful
 
 import (
 	"context"
-	"os"
 	"os/signal"
 	"syscall"
 	"time"
@@ -37,21 +36,14 @@ func Run(s Gracefully, opts ...Option) {
 		opt.apply(o)
 	}
 
-	notify, stop := signal.NotifyContext(
-		context.Background(),
-		os.Interrupt,
-		syscall.SIGHUP,
-		syscall.SIGINT,
-		syscall.SIGTERM,
-		syscall.SIGQUIT,
-	)
+	sig, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer stop()
 
 	// 启动服务
 	go s.Start()
 
 	// 当中断信号发生时，关闭服务器并返回
-	<-notify.Done()
+	<-sig.Done()
 
 	// 如果有设置超时时间，则使用该时间来优雅地关闭服务
 	ctx := context.Background()
