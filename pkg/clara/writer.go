@@ -28,8 +28,8 @@ type Writer struct {
 
 var _ = NewWriter
 
-func NewWriter(addresses []string, topic string, opts ...Option) *Writer {
-	c := New(addresses)
+func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
+	c := New(brokers)
 
 	w, exists := c.writers.Get(topic)
 	if exists {

@@ -24,8 +24,8 @@ type MessageListener func(message kafka.Message, err error) error
 var _ = NewReader
 
 // NewReader 创建一个新的Kafka Reader
-func NewReader(addresses []string, topic, groupID string) *Reader {
-	c := New(addresses)
+func NewReader(brokers []string, topic, groupID string) *Reader {
+	c := New(brokers)
 
 	return &Reader{
 		topic:   topic,
