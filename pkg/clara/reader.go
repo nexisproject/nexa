@@ -43,6 +43,12 @@ func NewReader(brokers []string, topic, groupID string) *Reader {
 	}
 }
 
+// With 自定义reader配置
+func (r *Reader) With(fn func(reader *kafka.Reader)) *Reader {
+	fn(r.reader)
+	return r
+}
+
 // Listen 监听消息回调
 func (r *Reader) Listen(cb MessageListener) error {
 	// r.SetOffset(42) // 设置Offset

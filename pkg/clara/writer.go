@@ -19,7 +19,7 @@ const (
 )
 
 type Writer struct {
-	*kafka.Writer
+	writer *kafka.Writer
 
 	retries       int
 	retryInterval time.Duration
@@ -28,6 +28,7 @@ type Writer struct {
 
 var _ = NewWriter
 
+// NewWriter 创建一个新的 Writer
 func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
 	c := New(brokers)
 
@@ -37,7 +38,7 @@ func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
 	}
 
 	w = &Writer{
-		Writer: &kafka.Writer{
+		writer: &kafka.Writer{
 			Addr:                   kafka.TCP(c.brokers...),
 			RequiredAcks:           kafka.RequireAll, // ack模式
 			Topic:                  topic,
@@ -59,6 +60,13 @@ func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
 	return w
 }
 
+// With 自定义reader配置
+func (w *Writer) With(fn func(reader *kafka.Writer)) *Writer {
+	fn(w.writer)
+	return w
+}
+
+// SendMessages 发送消息到Kafka
 func (w *Writer) SendMessages(messages ...kafka.Message) (err error) {
 	for i := 0; i < w.retries; i++ {
 		err = w.writeMessagesWithTimeout(messages...)
@@ -66,15 +74,15 @@ func (w *Writer) SendMessages(messages ...kafka.Message) (err error) {
 			time.Sleep(DefaultRetryInterval)
 			continue
 		}
-
 		return
 	}
 	return
 }
 
+// writeMessagesWithTimeout 写入消息，带有超时控制
 func (w *Writer) writeMessagesWithTimeout(messages ...kafka.Message) (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
 	defer cancel()
 
-	return w.WriteMessages(ctx, messages...)
+	return w.writer.WriteMessages(ctx, messages...)
 }
