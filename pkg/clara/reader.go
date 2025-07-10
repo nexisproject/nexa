@@ -50,12 +50,12 @@ func (r *Reader) With(fn func(reader *kafka.Reader)) *Reader {
 }
 
 // Listen 监听消息回调
-func (r *Reader) Listen(cb MessageListener) error {
+func (r *Reader) Listen(ctx context.Context, cb MessageListener) error {
 	// r.SetOffset(42) // 设置Offset
 
 	// 接收消息
 	for {
-		err := cb(r.reader.ReadMessage(context.Background()))
+		err := cb(r.reader.ReadMessage(ctx))
 		if err != nil {
 			return err
 		}

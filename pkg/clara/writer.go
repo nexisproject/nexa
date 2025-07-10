@@ -67,9 +67,9 @@ func (w *Writer) With(fn func(reader *kafka.Writer)) *Writer {
 }
 
 // SendMessages 发送消息到Kafka
-func (w *Writer) SendMessages(messages ...kafka.Message) (err error) {
+func (w *Writer) SendMessages(ctx context.Context, messages ...kafka.Message) (err error) {
 	for i := 0; i < w.retries; i++ {
-		err = w.writeMessagesWithTimeout(messages...)
+		err = w.writeMessagesWithTimeout(ctx, messages...)
 		if errors.Is(err, kafka.LeaderNotAvailable) || errors.Is(err, kafka.UnknownTopicOrPartition) || errors.Is(err, context.DeadlineExceeded) {
 			time.Sleep(DefaultRetryInterval)
 			continue
@@ -80,8 +80,9 @@ func (w *Writer) SendMessages(messages ...kafka.Message) (err error) {
 }
 
 // writeMessagesWithTimeout 写入消息，带有超时控制
-func (w *Writer) writeMessagesWithTimeout(messages ...kafka.Message) (err error) {
-	ctx, cancel := context.WithTimeout(context.Background(), DefaultTimeout)
+func (w *Writer) writeMessagesWithTimeout(ctx context.Context, messages ...kafka.Message) (err error) {
+	var cancel context.CancelFunc
+	ctx, cancel = context.WithTimeout(ctx, DefaultTimeout)
 	defer cancel()
 
 	return w.writer.WriteMessages(ctx, messages...)
