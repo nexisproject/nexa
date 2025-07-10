@@ -5,6 +5,8 @@
 package logger
 
 import (
+	"context"
+
 	"github.com/segmentio/kafka-go"
 
 	"nexis.run/nexa/pkg/clara"
@@ -21,7 +23,7 @@ func NewKafkaWriter(brokers []string, topic string) *KafkaWriter {
 }
 
 func (w *KafkaWriter) Write(p []byte) (n int, err error) {
-	err = w.SendMessages(kafka.Message{
+	err = w.SendMessages(context.Background(), kafka.Message{
 		Value: p,
 	})
 	if err != nil {
