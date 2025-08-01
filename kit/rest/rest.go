@@ -16,9 +16,10 @@ import (
 // 防止静态检查工具误报
 var _ = Run
 
-type Handler func(e *echo.Echo)
+type RouteHandler func(e *echo.Echo)
 
-func Run(app, address string, h Handler) (e *echo.Echo, ch chan error) {
+// Run 启动Rest服务
+func Run(app, address string, r RouteHandler) (e *echo.Echo, ch chan error) {
 	e = echo.New()
 
 	// 隐藏banner
@@ -66,7 +67,7 @@ func Run(app, address string, h Handler) (e *echo.Echo, ch chan error) {
 	)
 
 	// 设置路由
-	h(e)
+	r(e)
 
 	// 使用协程启动HTTP Rest服务器
 	ch = make(chan error, 1)

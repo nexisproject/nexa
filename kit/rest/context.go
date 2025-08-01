@@ -10,13 +10,7 @@ import (
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/labstack/echo/v4"
-
-	"nexis.run/nexa/kit"
 )
-
-type ContextWrapper interface {
-	BindValidate(ptr any)
-}
 
 // Context Rest服务上下文
 type Context struct {
@@ -43,15 +37,6 @@ func GetContext(c echo.Context) *Context {
 	}
 }
 
-// GetContextWrapper 获取上下文
-func GetContextWrapper[C ContextWrapper](c echo.Context) C {
-	ctx, ok := c.(C)
-	if !ok {
-		panic(NewError(http.StatusInternalServerError, kit.ErrInvalidContext.Error()))
-	}
-	return ctx
-}
-
 // BindValidate 绑定并校验
 func (c *Context) BindValidate(ptr any) {
 	err := c.Bind(ptr)
@@ -64,16 +49,9 @@ func (c *Context) BindValidate(ptr any) {
 	}
 }
 
-// BaseContextBinding 获取上下文并绑定
-func BaseContextBinding[T any](c echo.Context) (ctx *Context, req *T) {
+// ContextBinding 获取上下文并绑定参数，返回 Context
+func ContextBinding[T any](c echo.Context) (ctx *Context, req *T) {
 	ctx = GetContext(c)
-	req = new(T)
-	ctx.BindValidate(req)
-	return
-}
-
-func ContextBinding[C ContextWrapper, T any](c echo.Context) (ctx C, req *T) {
-	ctx = GetContextWrapper[C](c)
 	req = new(T)
 	ctx.BindValidate(req)
 	return
