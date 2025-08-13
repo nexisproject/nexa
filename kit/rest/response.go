@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/labstack/echo/v4"
 )
@@ -59,7 +60,9 @@ func (r *Response) SetMessage(message string) *Response {
 
 // SetData 设置data
 func (r *Response) SetData(data any) *Response {
-	r.Data = data
+	if !reflect.ValueOf(data).IsNil() {
+		r.Data = data
+	}
 	return r
 }
 
