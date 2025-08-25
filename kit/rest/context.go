@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"net/http"
 
-	jsoniter "github.com/json-iterator/go"
+	"github.com/bytedance/sonic"
 	"github.com/labstack/echo/v4"
 )
 
@@ -60,7 +60,7 @@ func ContextBinding[T any](c echo.Context) (ctx *Context, req *T) {
 // SendResponse 发送响应
 func (c *Context) SendResponse(params ...any) error {
 	buffer := &bytes.Buffer{}
-	encoder := jsoniter.NewEncoder(buffer)
+	encoder := sonic.ConfigDefault.NewEncoder(buffer)
 	encoder.SetEscapeHTML(false)
 	_ = encoder.Encode(NewResponse().SetParams(params...))
 
