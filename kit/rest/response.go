@@ -60,9 +60,15 @@ func (r *Response) SetMessage(message string) *Response {
 
 // SetData 设置data
 func (r *Response) SetData(data any) *Response {
-	if !reflect.ValueOf(data).IsNil() {
+	if data == nil {
+		return r
+	}
+
+	v := reflect.ValueOf(data)
+	if v.IsValid() && !v.IsZero() && !v.IsNil() {
 		r.Data = data
 	}
+
 	return r
 }
 
