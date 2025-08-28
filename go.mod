@@ -6,7 +6,6 @@ toolchain go1.23.1
 
 require (
 	github.com/bytedance/sonic v1.14.0
-	github.com/go-kit/kit v0.13.0
 	github.com/go-kratos/kratos/v2 v2.8.4
 	github.com/go-playground/locales v0.14.1
 	github.com/go-playground/universal-translator v0.18.1
@@ -17,7 +16,6 @@ require (
 	github.com/knadh/koanf/v2 v2.2.2
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/orcaman/concurrent-map/v2 v2.0.1
-	github.com/prometheus/client_golang v1.23.0
 	github.com/segmentio/kafka-go v0.4.49
 	github.com/sony/sonyflake/v2 v2.2.0
 	github.com/stretchr/testify v1.10.0
@@ -25,9 +23,7 @@ require (
 )
 
 require (
-	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
-	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
@@ -45,12 +41,8 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
-	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/pierrec/lz4/v4 v4.1.22 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/prometheus/client_model v0.6.2 // indirect
-	github.com/prometheus/common v0.65.0 // indirect
-	github.com/prometheus/procfs v0.17.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
