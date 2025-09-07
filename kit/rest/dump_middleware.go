@@ -209,6 +209,12 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 			return
 		}
 
+		if c.Get(MiddlewareKeyDumpSkip) != nil {
+			if skip, ok := c.Get(MiddlewareKeyDumpSkip).(bool); ok && skip {
+				return
+			}
+		}
+
 		fields := []zap.Field{
 			zap.String("method", c.Request().Method),
 			zap.String("url", c.Request().RequestURI),
@@ -262,4 +268,15 @@ func (mw *DumpZapLoggerMiddleware) WithDefaultConfig(skipper ew.Skipper) echo.Mi
 		ResponseHeader: false,
 		Skipper:        skipper,
 	})
+}
+
+var _ = DumpSkip
+
+func DumpSkip() echo.MiddlewareFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			c.Set(MiddlewareKeyDumpSkip, true)
+			return next(c)
+		}
+	}
 }
