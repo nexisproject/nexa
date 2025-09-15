@@ -61,3 +61,13 @@ func (r *Reader) Listen(ctx context.Context, cb MessageListener) error {
 		}
 	}
 }
+
+// Reader 获取底层kafka Reader实例
+func (r *Reader) Reader() *kafka.Reader {
+	return r.reader
+}
+
+// Close 关闭reader
+func (r *Reader) Close() error {
+	return r.reader.Close()
+}
