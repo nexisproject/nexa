@@ -6,6 +6,7 @@ package logger
 
 import (
 	"os"
+	"sync"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -13,24 +14,30 @@ import (
 	"nexis.run/nexa/kit/configure"
 )
 
+var (
+	kafkaWriter *KafkaWriter
+	once        sync.Once
+)
+
 func Setup(cfg *configure.Logger) {
 	var cores []zapcore.Core
 
 	// 配置级别
-	consoleLevel := zap.NewAtomicLevelAt(zapcore.DebugLevel) // 控制台可以接收所有日志级别
-	kafkaLevel := zap.NewAtomicLevelAt(zapcore.InfoLevel)    // Kafka仅接收Info及以上级别
+	consoleLevel := zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	kafkaLevel := zap.NewAtomicLevelAt(zapcore.InfoLevel)
 
-	// 配置编码器
+	// 配置编码器 - 明确区分控制台和Kafka的编码器
 	consoleEncoderConfig := zap.NewDevelopmentEncoderConfig()
+	consoleEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	consoleEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig)
 
 	// 判断是否需要输出到控制台
 	shouldLogToConsole := cfg.Stdout || (cfg.Kafka == nil)
 	if shouldLogToConsole {
-		// 控制台输出core
 		consoleCore := zapcore.NewCore(
 			consoleEncoder,
-			zapcore.Lock(os.Stdout),
+			zapcore.Lock(os.Stdout), // 明确使用控制台输出
 			consoleLevel,
 		)
 		cores = append(cores, consoleCore)
@@ -38,18 +45,21 @@ func Setup(cfg *configure.Logger) {
 
 	// 判断是否需要输出到Kafka
 	if cfg.Kafka != nil && len(cfg.Kafka.Brokers) > 0 {
-		// Kafka输出配置使用JSON格式
+		// Kafka输出配置使用JSON格式 - 明确使用不同的配置
 		kafkaEncoderConfig := zap.NewProductionEncoderConfig()
 		kafkaEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		kafkaEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		kafkaEncoder := zapcore.NewJSONEncoder(kafkaEncoderConfig)
 
-		// 创建Kafka writer
-		w := NewKafkaWriter(cfg.Kafka.Brokers, cfg.Kafka.Topic)
+		// 使用单例模式确保只有一个Kafka writer实例
+		once.Do(func() {
+			kafkaWriter = NewKafkaWriter(cfg.Kafka.Brokers, cfg.Kafka.Topic)
+		})
 
-		// Kafka core只处理Info级别及以上的日志
+		// 确保Kafka core只处理JSON格式的日志
 		kafkaCore := zapcore.NewCore(
 			kafkaEncoder,
-			w,
+			zapcore.AddSync(kafkaWriter), // 使用AddSync包装
 			kafkaLevel,
 		)
 
