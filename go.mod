@@ -19,7 +19,7 @@ require (
 	github.com/segmentio/kafka-go v0.4.49
 	github.com/sony/sonyflake/v2 v2.2.0
 	github.com/stretchr/testify v1.10.0
-	go.uber.org/zap v1.27.0
+	go.uber.org/zap v1.27.1-0.20250602160036-07077a697f63
 )
 
 require (

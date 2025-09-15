@@ -203,6 +203,12 @@ func getHeaders(headers http.Header, skipper HeaderSkipper) (strs []string) {
 	return
 }
 
+type DumpReceived = int8
+
+const (
+	DumpReceivedRestServer DumpReceived = 1 // 1: reset server 收到请求
+)
+
 func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFunc {
 	return dump(func(c echo.Context, reqBody []byte, resBody []byte) {
 		if cfg.Skipper != nil && cfg.Skipper(c) {
@@ -218,7 +224,7 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 		fields := []zap.Field{
 			zap.String("method", c.Request().Method),
 			zap.String("url", c.Request().RequestURI),
-			zap.Int8("dump", 1), // 1: 收到请求
+			zap.Int8("received", DumpReceivedRestServer),
 			zap.String("remote_addr", c.Request().RemoteAddr),
 		}
 
