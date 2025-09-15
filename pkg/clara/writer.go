@@ -41,10 +41,14 @@ func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
 		writer: &kafka.Writer{
 			Addr:                   kafka.TCP(c.brokers...),
 			Topic:                  topic,
-			AllowAutoTopicCreation: true, // 自动创建topic
-			Async:                  true, // 异步
-			// RequiredAcks:           kafka.RequireAll, // ack模式
-			// Balancer:               &kafka.LeastBytes{}, // 指定分区的balancer模式为最小字节分布
+			AllowAutoTopicCreation: true,                // 自动创建topic
+			Async:                  true,                // 异步
+			Balancer:               &kafka.LeastBytes{}, // 选择分区策略，这里使用最小字节策略（保持）
+			BatchSize:              100,                 // 设置批次大小，以消息数量为单位（选填）
+			BatchBytes:             1024 * 1024,         // 设置批次字节大小上限（选填）
+			BatchTimeout:           1 * time.Second,     // 批次超时时间，触发批量发送的超时机制（选填）
+			RequiredAcks:           kafka.RequireOne,    // 设置应答级别，仅需一个副本确认，平衡可靠性和性能（保持，默认kafka.RequireNone）
+			Compression:            kafka.Snappy,        // 使用Snappy压缩以减少网络传输量（选填）
 		},
 		retries:       DefaultRetries,
 		retryInterval: DefaultRetryInterval,
