@@ -40,10 +40,10 @@ func NewWriter(brokers []string, topic string, opts ...Option) *Writer {
 	w = &Writer{
 		writer: &kafka.Writer{
 			Addr:                   kafka.TCP(c.brokers...),
-			RequiredAcks:           kafka.RequireAll, // ack模式
 			Topic:                  topic,
-			Async:                  true, // 异步
 			AllowAutoTopicCreation: true, // 自动创建topic
+			Async:                  true, // 异步
+			// RequiredAcks:           kafka.RequireAll, // ack模式
 			// Balancer:               &kafka.LeastBytes{}, // 指定分区的balancer模式为最小字节分布
 		},
 		retries:       DefaultRetries,
@@ -71,7 +71,7 @@ func (w *Writer) SendMessages(ctx context.Context, messages ...kafka.Message) (e
 	for i := 0; i < w.retries; i++ {
 		err = w.writeMessagesWithTimeout(ctx, messages...)
 		if errors.Is(err, kafka.LeaderNotAvailable) || errors.Is(err, kafka.UnknownTopicOrPartition) || errors.Is(err, context.DeadlineExceeded) {
-			time.Sleep(DefaultRetryInterval)
+			time.Sleep(w.retryInterval)
 			continue
 		}
 		return
@@ -82,8 +82,13 @@ func (w *Writer) SendMessages(ctx context.Context, messages ...kafka.Message) (e
 // writeMessagesWithTimeout 写入消息，带有超时控制
 func (w *Writer) writeMessagesWithTimeout(ctx context.Context, messages ...kafka.Message) (err error) {
 	var cancel context.CancelFunc
-	ctx, cancel = context.WithTimeout(ctx, DefaultTimeout)
+	ctx, cancel = context.WithTimeout(ctx, w.timeout)
 	defer cancel()
 
 	return w.writer.WriteMessages(ctx, messages...)
+}
+
+// Close 关闭writer
+func (w *Writer) Close() error {
+	return w.writer.Close()
 }
