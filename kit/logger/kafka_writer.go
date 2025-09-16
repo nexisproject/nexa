@@ -23,8 +23,12 @@ func NewKafkaWriter(brokers []string, topic string) *KafkaWriter {
 }
 
 func (w *KafkaWriter) Write(p []byte) (n int, err error) {
+	// 创建一个副本以避免数据竞争
+	safeCopy := make([]byte, len(p))
+	copy(safeCopy, p)
+
 	err = w.SendMessages(context.Background(), kafka.Message{
-		Value: p,
+		Value: safeCopy,
 	})
 	if err != nil {
 		return

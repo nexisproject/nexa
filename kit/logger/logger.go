@@ -6,17 +6,11 @@ package logger
 
 import (
 	"os"
-	"sync"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"nexis.run/nexa/kit/configure"
-)
-
-var (
-	kafkaWriter *KafkaWriter
-	once        sync.Once
 )
 
 func Setup(cfg *configure.Logger) {
@@ -50,11 +44,7 @@ func Setup(cfg *configure.Logger) {
 		kafkaEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 		kafkaEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
 		kafkaEncoder := zapcore.NewJSONEncoder(kafkaEncoderConfig)
-
-		// 使用单例模式确保只有一个Kafka writer实例
-		once.Do(func() {
-			kafkaWriter = NewKafkaWriter(cfg.Kafka.Brokers, cfg.Kafka.Topic)
-		})
+		kafkaWriter := NewKafkaWriter(cfg.Kafka.Brokers, cfg.Kafka.Topic)
 
 		// 确保Kafka core只处理JSON格式的日志
 		kafkaCore := zapcore.NewCore(
