@@ -11,3 +11,10 @@ type Context struct {
 
 	App string
 }
+
+func NewContext(app string) *Context {
+	return &Context{
+		Context: context.WithValue(context.Background(), "app", app),
+		App:     app,
+	}
+}

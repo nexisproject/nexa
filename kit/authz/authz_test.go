@@ -6,12 +6,12 @@ package authz
 
 import (
 	"context"
-	"errors"
 	"testing"
 
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
 	"gopkg.auroraride.com/rbac"
 
 	"nexis.run/nexa/kit/micro"
@@ -22,6 +22,7 @@ var (
 	allowedPermission = "allowed_permission"
 	existingProject   = "existing_project"
 	testToken         = "test-token"
+	testUid           = "test_uid"
 )
 
 type testServer struct {
@@ -47,17 +48,26 @@ func (*testServer) GetRestrictedUser(_ context.Context, req *rbac.GetRestrictedU
 	return res, nil
 }
 
-func (*testServer) GetUser(context.Context, *rbac.GetUserRequest) (*rbac.GetUserResponse, error) {
-	// return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
-	return nil, errors.New("not implemented")
+func (*testServer) GetUser(_ context.Context, req *rbac.GetUserRequest) (*rbac.GetUserResponse, error) {
+	var user *rbac.User
+	if req.Uid == testUid {
+		user = &rbac.User{
+			Uid: testUid,
+		}
+	}
+
+	return &rbac.GetUserResponse{
+		UserInfo: user,
+	}, nil
 }
 
 func TestServer(t *testing.T) {
+	l, _ := zap.NewDevelopment()
+	zap.ReplaceGlobals(l)
+
 	micro.Run("test-app", testAddress, func(s *grpc.Server) {
 		rbac.RegisterRBACServiceServer(s, &testServer{})
-	})
-
-	t.Logf("Test gRPC server running on %s", testAddress)
+	}, micro.LoggingMiddlewareServerOption())
 
 	select {}
 }
@@ -81,4 +91,15 @@ func TestGetRestrictedUser(t *testing.T) {
 	require.NoError(t, err)
 	require.True(t, res.HasPermission)
 	require.Nil(t, res.UserInfo)
+}
+
+func TestGetUser(t *testing.T) {
+	Setup(testAddress)
+
+	ctx := context.Background()
+
+	res, err := GetUser(ctx, testUid)
+	require.NoError(t, err)
+	require.NotNil(t, res)
+	require.Equal(t, testUid, res.Uid)
 }

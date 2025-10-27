@@ -23,15 +23,18 @@ var _ = Run
 
 type Handler func(s *grpc.Server)
 
-func Run(app, address string, h Handler) (server *grpc.Server, ch chan error) {
+// Run 启动 gRPC 服务器
+func Run(app, address string, h Handler, opts ...grpc.ServerOption) (server *grpc.Server, ch chan error) {
 	ctx := NewContext(app)
 
-	server = grpc.NewServer(
+	opts = append([]grpc.ServerOption{
 		grpc.Address(address),
 		grpc.Middleware(
 			RecoverMiddleware(),
 		),
-	)
+	}, opts...)
+
+	server = grpc.NewServer(opts...)
 
 	h(server)
 

@@ -55,10 +55,8 @@ func GetRestrictedUser(ctx context.Context, token string, projectCode string, pe
 	return res, err
 }
 
-var _ = GetUserFromUid
-
-// GetUserFromUid 获取用户信息
-func GetUserFromUid(ctx context.Context, uid string, opts ...Option) (*rbac.User, error) {
+// GetUser 获取用户信息
+func GetUser(ctx context.Context, uid string, opts ...Option) (*rbac.User, error) {
 	o := defaultOption
 	for _, opt := range opts {
 		opt.apply(o)
