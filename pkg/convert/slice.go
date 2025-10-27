@@ -4,10 +4,12 @@
 
 package convert
 
+// Reverse 返回一个反转切片, 原切片不变
 func Reverse[S ~[]E, E any](s S) (result S) {
-	result = make(S, len(s))
-	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
-		result[i], result[j] = s[j], s[i]
+	n := len(s)
+	result = make(S, n)
+	for i, j := 0, n-1; i < n; i, j = i+1, j-1 {
+		result[i] = s[j]
 	}
 	return result
 }

@@ -4,6 +4,7 @@
 
 package rest
 
+// MiddlewareKey 定义中间件使用的key
 type MiddlewareKey = string
 
 const (

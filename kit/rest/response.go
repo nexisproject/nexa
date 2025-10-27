@@ -13,26 +13,6 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type Error struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
-}
-
-func (e *Error) Error() string {
-	return fmt.Sprintf("code: %d, message: %s", e.Code, e.Message)
-}
-
-func NewError(code int, message string) *Error {
-	err := &Error{
-		Code:    code,
-		Message: message,
-	}
-	if err.Message == "" {
-		err.Message = http.StatusText(code)
-	}
-	return err
-}
-
 type Response struct {
 	Code    int    `json:"code"`
 	Message string `json:"message,omitempty"`
