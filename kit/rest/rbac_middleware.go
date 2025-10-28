@@ -18,6 +18,7 @@ import (
 type RBACMiddlewareConfig struct {
 	EnableRemoteAuth bool       // 是否启用远程权限验证
 	StaticUser       *rbac.User // 静态用户信息（当不使用远程验证时）
+	Skipper          ew.Skipper // 跳过函数
 }
 
 type RBACMiddlewareOption func(*RBACMiddlewareConfig)
@@ -40,8 +41,19 @@ func WithRBACStaticUser(user *rbac.User) RBACMiddlewareOption {
 	}
 }
 
+var _ = WithRBACSkipper
+
+// WithRBACSkipper 设置跳过函数
+func WithRBACSkipper(skipper ew.Skipper) RBACMiddlewareOption {
+	return func(cfg *RBACMiddlewareConfig) {
+		cfg.Skipper = skipper
+	}
+}
+
+var _ = RBACMiddleware
+
 // RBACMiddleware 权限控制中间件
-func RBACMiddleware(skipper ew.Skipper, opts ...RBACMiddlewareOption) echo.MiddlewareFunc {
+func RBACMiddleware(opts ...RBACMiddlewareOption) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			cfg := &RBACMiddlewareConfig{
@@ -55,7 +67,7 @@ func RBACMiddleware(skipper ew.Skipper, opts ...RBACMiddlewareOption) echo.Middl
 			ctx := GetContext(c)
 
 			// 是否跳过权限检查
-			skip := skipper != nil && skipper(c)
+			skip := cfg.Skipper != nil && cfg.Skipper(c)
 
 			// 获取用户token
 			token := c.Request().Header.Get(HeaderAuthToken)
