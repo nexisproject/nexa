@@ -9,48 +9,99 @@ import (
 
 	"github.com/labstack/echo/v4"
 	ew "github.com/labstack/echo/v4/middleware"
+	"gopkg.auroraride.com/rbac"
 
 	"nexis.run/nexa/kit/authz"
 )
 
+// RBACMiddlewareConfig 权限控制中间件配置
+type RBACMiddlewareConfig struct {
+	EnableRemoteAuth bool       // 是否启用远程权限验证
+	StaticUser       *rbac.User // 静态用户信息（当不使用远程验证时）
+}
+
+type RBACMiddlewareOption func(*RBACMiddlewareConfig)
+
+var _ = WithRBACRemoteAuth
+
+// WithRBACRemoteAuth 设置是否启用远程权限验证
+func WithRBACRemoteAuth(enable bool) RBACMiddlewareOption {
+	return func(cfg *RBACMiddlewareConfig) {
+		cfg.EnableRemoteAuth = enable
+	}
+}
+
+var _ = WithRBACStaticUser
+
+// WithRBACStaticUser 设置静态用户信息
+func WithRBACStaticUser(user *rbac.User) RBACMiddlewareOption {
+	return func(cfg *RBACMiddlewareConfig) {
+		cfg.StaticUser = user
+	}
+}
+
 // RBACMiddleware 权限控制中间件
-func RBACMiddleware(skipper ew.Skipper) echo.MiddlewareFunc {
+func RBACMiddleware(skipper ew.Skipper, opts ...RBACMiddlewareOption) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			if skipper != nil && skipper(c) {
-				return next(c)
+			cfg := &RBACMiddlewareConfig{
+				EnableRemoteAuth: true,
 			}
+
+			for _, opt := range opts {
+				opt(cfg)
+			}
+
+			ctx := GetContext(c)
+
+			// 是否跳过权限检查
+			skip := skipper != nil && skipper(c)
 
 			// 获取用户token
 			token := c.Request().Header.Get(HeaderAuthToken)
 			projectCode := c.Request().Header.Get(HeaderProjectCode)
 			permissionKey := c.Request().Header.Get(HeaderPermissionKey)
 
-			if token != "" && projectCode != "" && permissionKey != "" {
+			var (
+				user          *rbac.User
+				hasPermission bool
+			)
+
+			// 获取用户信息和权限
+			if cfg.EnableRemoteAuth && token != "" && projectCode != "" && permissionKey != "" {
 				authed, err := authz.GetRestrictedUser(c.Request().Context(), token, projectCode, permissionKey)
 				if err != nil {
 					return err
 				}
 
-				// 检查权限
-				if !authed.HasPermission {
-					return WrapError(http.StatusForbidden, authz.ErrForbidden)
-				}
-
-				// 检查用户信息
-				if authed.UserInfo == nil {
-					return WrapError(http.StatusUnauthorized, authz.ErrUnauthorized)
-				}
-
-				// 设置用户信息到上下文
-				ctx := GetContext(c)
-				ctx.User = authed.UserInfo
-				c.Set(ContextKeyUser, authed.UserInfo)
-
-				return next(ctx)
+				user = authed.UserInfo
+				hasPermission = authed.HasPermission
 			}
 
-			return next(c)
+			// 如果未使用远程验证且配置了静态用户信息
+			if !cfg.EnableRemoteAuth && cfg.StaticUser != nil {
+				user = cfg.StaticUser
+				hasPermission = true
+			}
+
+			// 如果用户信息不为空
+			if user != nil {
+				// 设置用户信息到上下文
+				ctx.User = user
+				c.Set(ContextKeyUser, user)
+			}
+
+			// 检查用户信息是否跳过
+			if !skip && user == nil {
+				return WrapError(http.StatusUnauthorized, authz.ErrUnauthorized)
+			}
+
+			// 检查权限是否跳过
+			if !skip && !hasPermission {
+				return WrapError(http.StatusForbidden, authz.ErrForbidden)
+			}
+
+			return next(ctx)
 		}
 	}
 }
