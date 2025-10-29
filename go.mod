@@ -60,6 +60,6 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
 	google.golang.org/grpc v1.76.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
-	gopkg.auroraride.com/rbac v0.0.0-20251024094849-abe1e361c3b7 // indirect
+	gopkg.auroraride.com/rbac v0.0.0-20251029071846-0d81ad4beccd // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

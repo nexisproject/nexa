@@ -208,6 +208,12 @@ google.golang.org/protobuf v1.36.10 h1:AYd7cD/uASjIL6Q9LiTjz8JLcrh/88q5UObnmY3aO
 google.golang.org/protobuf v1.36.10/go.mod h1:HTf+CrKn2C3g5S8VImy6tdcUvCska2kB7j23XfzDpco=
 gopkg.auroraride.com/rbac v0.0.0-20251024094849-abe1e361c3b7 h1:R/WFVkoGoUoTBuxBGw/EtN4LYK7+ijWVzoygUh3NEhc=
 gopkg.auroraride.com/rbac v0.0.0-20251024094849-abe1e361c3b7/go.mod h1:4FE8Mvy+9QDs6AWD/T3Fcb7WwZn0SmG9QRi9hfwoV6Y=
+gopkg.auroraride.com/rbac v0.0.0-20251029065826-25df8d7fdada h1:WAOHYB0y03mQKqrzPGmcfmp796ckC8RLXvzHWQQpJpc=
+gopkg.auroraride.com/rbac v0.0.0-20251029065826-25df8d7fdada/go.mod h1:4FE8Mvy+9QDs6AWD/T3Fcb7WwZn0SmG9QRi9hfwoV6Y=
+gopkg.auroraride.com/rbac v0.0.0-20251029070051-39b16e8bca9c h1:PsE/RP6ni5c5izRj56wz8NSTNRWTrKkE/FZua/MDy0s=
+gopkg.auroraride.com/rbac v0.0.0-20251029070051-39b16e8bca9c/go.mod h1:4FE8Mvy+9QDs6AWD/T3Fcb7WwZn0SmG9QRi9hfwoV6Y=
+gopkg.auroraride.com/rbac v0.0.0-20251029071846-0d81ad4beccd h1:5go5CXU6fGzbEkZVklbzyT4sYAiW3aP/f6qTzlO6HDY=
+gopkg.auroraride.com/rbac v0.0.0-20251029071846-0d81ad4beccd/go.mod h1:4FE8Mvy+9QDs6AWD/T3Fcb7WwZn0SmG9QRi9hfwoV6Y=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c h1:Hei/4ADfdWqJk1ZMxUNpqntNwaWcugrBjAiHlqqRiVk=
 gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c/go.mod h1:JHkPIbrfpd72SG/EVd6muEfDQjcINNoR0C8j2r3qZ4Q=
