@@ -19,6 +19,7 @@ type RBACMiddlewareConfig struct {
 	EnableRemoteAuth bool       // 是否启用远程权限验证
 	StaticUser       *rbac.User // 静态用户信息（当不使用远程验证时）
 	Skipper          ew.Skipper // 跳过函数
+	ProjectCode      string     // 项目代码
 }
 
 type RBACMiddlewareOption func(*RBACMiddlewareConfig)
@@ -50,6 +51,15 @@ func WithRBACSkipper(skipper ew.Skipper) RBACMiddlewareOption {
 	}
 }
 
+var _ = WithRBACProjectCode
+
+// WithRBACProjectCode 设置项目代码
+func WithRBACProjectCode(projectCode string) RBACMiddlewareOption {
+	return func(cfg *RBACMiddlewareConfig) {
+		cfg.ProjectCode = projectCode
+	}
+}
+
 var _ = RBACMiddleware
 
 // RBACMiddleware 权限控制中间件
@@ -71,8 +81,13 @@ func RBACMiddleware(opts ...RBACMiddlewareOption) echo.MiddlewareFunc {
 
 			// 获取用户token
 			token := c.Request().Header.Get(HeaderAuthToken)
-			projectCode := c.Request().Header.Get(HeaderProjectCode)
 			permissionKey := c.Request().Header.Get(HeaderPermissionKey)
+
+			// 获取项目代码, 优先使用配置中的值
+			projectCode := cfg.ProjectCode
+			if projectCode == "" {
+				projectCode = c.Request().Header.Get(HeaderProjectCode)
+			}
 
 			var (
 				user          *rbac.User
