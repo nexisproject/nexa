@@ -20,7 +20,7 @@ require (
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/zap v1.27.1-0.20250602160036-07077a697f63
 	google.golang.org/grpc v1.76.0
-	gopkg.auroraride.com/rbac v0.0.0-20251030083222-0f51d425f5f0
+	gopkg.auroraride.com/rbac v0.0.0-20251030094957-d5c697b0079b
 )
 
 require (
