@@ -50,6 +50,7 @@ func (c *Context) BindValidate(ptr any) {
 	if err != nil {
 		panic(NewError(http.StatusBadRequest, err.Error()))
 	}
+
 	err = c.Validate(ptr)
 	if err != nil {
 		panic(NewError(http.StatusBadRequest, err.Error()))

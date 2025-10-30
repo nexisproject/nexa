@@ -46,7 +46,7 @@ func GetRestrictedUser(ctx context.Context, token string, projectCode string, pe
 
 	res, err := instance.GetRestrictedUser(GetRBACContext(ctx, token), &rbac.GetRestrictedUserRequest{
 		PermissionKey: permissionKey,
-		ProjectCode:   rbac.RawToProjectCode(projectCode),
+		ProjectCode:   rbac.GetProjectCode(projectCode),
 	})
 	if o.errorHandler != nil {
 		err = o.errorHandler(err)

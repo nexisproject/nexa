@@ -6,6 +6,7 @@ package rest
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -24,6 +25,7 @@ func RecoverMiddleware() echo.MiddlewareFunc {
 					default:
 						err := fmt.Errorf("%v", v)
 						zap.L().Error("捕获HTTP未处理崩溃", zap.Error(err), zap.Stack("stack"))
+						_ = ctx.SendResponse(http.StatusInternalServerError, err.Error())
 					}
 				}
 			}()
