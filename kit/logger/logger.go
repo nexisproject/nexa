@@ -21,10 +21,7 @@ func Setup(cfg *configure.Logger) {
 	kafkaLevel := zap.NewAtomicLevelAt(zapcore.InfoLevel)
 
 	// 配置编码器 - 明确区分控制台和Kafka的编码器
-	consoleEncoderConfig := zap.NewDevelopmentEncoderConfig()
-	consoleEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	consoleEncoderConfig.EncodeLevel = zapcore.CapitalLevelEncoder
-	consoleEncoder := zapcore.NewConsoleEncoder(consoleEncoderConfig)
+	consoleEncoder := ConsoleEncoder()
 
 	// 判断是否需要输出到控制台
 	shouldLogToConsole := cfg.Stdout || (cfg.Kafka == nil)
