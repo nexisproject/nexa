@@ -25,14 +25,14 @@ type Config struct {
 	ConfigFileName string `json:"-" yaml:"-"` // 配置文件名称
 
 	EntPath   string `yaml:"entPath"`   // ent 目录，默认值：internal/infrastructure/ent
-	DaoPath   string `yaml:"daoPath"`   // 数据访问对象目录，默认值：internal/presentation/dao
+	DaoPath   string `yaml:"daoPath"`   // 数据访问对象目录，默认值：internal/infrastructure/dao
 	OrmClient string `yaml:"ormclient"` // ORM 客户端，默认值：ent.Database
 }
 
 func defaultConfig() *Config {
 	return &Config{
 		EntPath:   "internal/infrastructure/ent",
-		DaoPath:   "internal/presentation/dao",
+		DaoPath:   "internal/infrastructure/dao",
 		OrmClient: "ent.Database",
 	}
 }
