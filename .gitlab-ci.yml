@@ -65,12 +65,20 @@ sync:
       CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
       echo "当前分支: $CURRENT_BRANCH"
       
+      # GitLab CI 默认处于 detached HEAD 状态，需要切换到 master 分支
+      if [ "$CURRENT_BRANCH" = "HEAD" ]; then
+        echo "检测到 detached HEAD 状态，切换到 master 分支..."
+        git checkout -B master origin/master
+        CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "已切换到分支: $CURRENT_BRANCH"
+      fi
+      
       if [ "$CURRENT_BRANCH" = "master" ]; then
         echo "强制推送 master 分支到 GitHub..."
         git push --force github master:master
         echo "✓ master 分支同步成功"
       else
-        echo "警告: 当前不在 master 分支，跳过推送"
+        echo "错误: 无法切换到 master 分支，当前分支: $CURRENT_BRANCH"
         exit 1
       fi
       
