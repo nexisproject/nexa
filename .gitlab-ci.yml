@@ -200,15 +200,42 @@ release:
 
       # 获取提交日志作为 release notes
       echo "生成 Release Notes..."
-      LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-      if [ -n "$LAST_TAG" ]; then
-        RELEASE_NOTES=$(git log --pretty=format:'- %s' ${LAST_TAG}..HEAD | head -20)
+      
+      # 从 GitHub 获取上一个 release 的 tag 和 commit
+      echo "从 GitHub 获取上次 release 信息..."
+      LAST_RELEASE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+        "https://api.github.com/repos/nexisproject/nexa/releases/latest" 2>/dev/null)
+      
+      LAST_TAG_NAME=$(echo "$LAST_RELEASE" | grep -o '"tag_name": "[^"]*"' | head -1 | sed 's/"tag_name": "\(.*\)"/\1/')
+      LAST_COMMIT_SHA=$(echo "$LAST_RELEASE" | grep -o '"target_commitish": "[^"]*"' | head -1 | sed 's/"target_commitish": "\(.*\)"/\1/')
+      
+      echo "上次 Release Tag: ${LAST_TAG_NAME:-无}"
+      echo "上次 Commit SHA: ${LAST_COMMIT_SHA:-无}"
+      
+      # 当前 commit
+      CURRENT_COMMIT=$(git rev-parse HEAD)
+      echo "当前 Commit: $CURRENT_COMMIT"
+      
+      # 生成 release notes
+      if [ -n "$LAST_COMMIT_SHA" ] && [ "$LAST_COMMIT_SHA" != "$CURRENT_COMMIT" ]; then
+        echo "生成从 $LAST_COMMIT_SHA 到 $CURRENT_COMMIT 的提交日志..."
+        # 使用 commit hash 范围
+        RELEASE_NOTES=$(git log --pretty=format:'- %s' ${LAST_COMMIT_SHA}..${CURRENT_COMMIT} 2>/dev/null | head -20)
       else
-        RELEASE_NOTES=$(git log --pretty=format:'- %s' HEAD~10..HEAD)
+        echo "无上次 release 或 commit 相同，获取最近的提交..."
+        # 获取最近 10 条提交
+        RELEASE_NOTES=$(git log --pretty=format:'- %s' -10 HEAD 2>/dev/null)
       fi
       
-      if [ -z "$RELEASE_NOTES" ]; then 
+      # 检查是否成功获取
+      if [ -z "$RELEASE_NOTES" ]; then
+        echo "警告: 无法获取提交日志，使用默认 release notes"
         RELEASE_NOTES="Auto release by GitLab CI for $TAG"
+      else
+        echo "✓ 成功生成 release notes"
+        # 显示前 3 行预览
+        echo "预览:"
+        echo "$RELEASE_NOTES" | head -3
       fi
       
       # 转义 JSON 特殊字符
