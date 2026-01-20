@@ -108,8 +108,13 @@ build:
     - |
       make clean
       echo "从源码 cmd/nexa/main.go 中获取版本号..."
-      VERSION=$(grep 'var Version = ' cmd/nexa/main.go | awk -F'"' '{print $2}')
+      VERSION=$(grep -E '^\s*Version\s*=' cmd/nexa/main.go | awk -F'"' '{print $2}')
       echo "基础版本号: $VERSION"
+      
+      if [ -z "$VERSION" ]; then
+        echo "错误: 无法从 cmd/nexa/main.go 提取版本号"
+        exit 1
+      fi
       
       echo "获取 Commit Short Hash..."
       COMMIT_HASH=$(git rev-parse --short HEAD)
@@ -152,7 +157,13 @@ release:
     - |
       # 获取版本号（格式: 0.1.0.508c2eb）
       echo "获取版本号..."
-      VERSION=$(grep 'var Version = ' cmd/nexa/main.go | awk -F'"' '{print $2}')
+      VERSION=$(grep -E '^\s*Version\s*=' cmd/nexa/main.go | awk -F'"' '{print $2}')
+      
+      if [ -z "$VERSION" ]; then
+        echo "错误: 无法从 cmd/nexa/main.go 提取版本号"
+        exit 1
+      fi
+      
       COMMIT_HASH=$(git rev-parse --short HEAD)
       FULL_VERSION="${VERSION}.${COMMIT_HASH}"
       TAG="${FULL_VERSION}"
