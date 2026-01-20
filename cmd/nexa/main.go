@@ -14,7 +14,15 @@ import (
 	"nexis.run/nexa/cmd/nexa/internal/command"
 )
 
-var Version = "0.1.0"
+var (
+	Version   = "0.1.0"
+	BuildTime string
+	Hash      string
+)
+
+func getVersion() string {
+	return fmt.Sprintf("%s.%s (built at %s)", Version, Hash, BuildTime)
+}
 
 func main() {
 	var (
@@ -25,7 +33,7 @@ func main() {
 		Use:               "nexa",
 		Short:             "NEXA 框架实用工具",
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
-		Version:           Version,
+		Version:           getVersion(),
 		PersistentPreRun: func(_ *cobra.Command, _ []string) {
 			// 初始化变量
 			err := base.InitializeConfig(configFile)
