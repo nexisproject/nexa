@@ -1,0 +1,25 @@
+// Copyright (C) {{ .Module }}. {{ .Year }}-present.
+//
+// Created at {{ .Date }}, by nexa cli.
+
+package {{ .Package }}
+
+import (
+    "{{ .EntPkgImport }}"
+    "{{ .EntPkgImport }}/{{ .NameLower }}"
+)
+
+type {{ .Name }}Dao struct {
+    orm *ent.{{ .Name }}Client
+}
+
+func New{{ .Name }}(params ...*ent.{{ .Name }}Client) *{{ .Name }}Dao {
+    orm := {{ .OrmClient }}.{{ .Name }}
+    if len(params) > 0 {
+        orm = params[0]
+    }
+
+    return &{{ .Name }}Dao{
+        orm: orm,
+    }
+}
