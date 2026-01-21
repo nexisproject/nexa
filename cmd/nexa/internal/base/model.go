@@ -11,11 +11,19 @@ type CommonTemplateVariables struct {
 	Package string
 }
 
+// DaoTemplateVariables 定义 DAO 模板变量
 type DaoTemplateVariables struct {
-	CommonTemplateVariables
+	*CommonTemplateVariables
 
 	EntPkgImport string
 	NameLower    string
 	Name         string
 	OrmClient    string
+}
+
+// EchoCtxTemplateVariables 定义 echo Context 模板变量
+type EchoCtxTemplateVariables struct {
+	*CommonTemplateVariables
+
+	Name string
 }

@@ -6,8 +6,6 @@ package command
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -17,6 +15,10 @@ import (
 )
 
 func NewCmd() (*cobra.Group, *cobra.Command) {
+	var (
+		force bool
+	)
+
 	g := &cobra.Group{
 		ID:    "new",
 		Title: "新建代码命令",
@@ -30,17 +32,16 @@ func NewCmd() (*cobra.Group, *cobra.Command) {
 	}
 
 	cmd.AddCommand(
-		newDaoCmd(),
+		newDaoCmd(force),
+		newEchoctxCmd(force),
 	)
+
+	cmd.PersistentFlags().BoolVarP(&force, "force", "f", false, "覆盖已存在的文件")
 
 	return g, cmd
 }
 
-func newDaoCmd() (cmd *cobra.Command) {
-	var (
-		force bool
-	)
-
+func newDaoCmd(force bool) (cmd *cobra.Command) {
 	cmd = &cobra.Command{
 		Use:               "dao [names]",
 		Short:             "新建数据访问对象模板",
@@ -49,55 +50,70 @@ func newDaoCmd() (cmd *cobra.Command) {
 			"nexa new dao User",
 			"nexa new dao User --force",
 		),
-		Args: func(_ *cobra.Command, names []string) error {
-			for _, name := range names {
-				if !base.StringIsUpperStart(name) {
-					return base.ErrNameMustStartWithUpper
-				}
-			}
-			return nil
-		},
-		Run: func(_ *cobra.Command, names []string) {
-			cfg, err := base.GetConfig()
+		Args: isUpperStartArgs,
+		RunE: func(_ *cobra.Command, names []string) (err error) {
+			var g *gen.Gen
+			g, err = gen.New()
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				return
 			}
 
-			var b []byte
 			for _, name := range names {
-				filename := filepath.Join(cfg.RootDir, cfg.DaoPath, strings.ToLower(name+".go"))
-
-				b, err = gen.RenderDao(cfg, name)
+				err = g.Generate(gen.PackageDao, name, force, func(g *gen.Gen, c *base.CommonTemplateVariables) any {
+					return &base.DaoTemplateVariables{
+						CommonTemplateVariables: c,
+						EntPkgImport:            base.GetPkgImport(g.Module, g.Config.RootDir, g.Config.EntPath),
+						NameLower:               strings.ToLower(name),
+						Name:                    name,
+						OrmClient:               g.Config.OrmClient,
+					}
+				})
 				if err != nil {
-					fmt.Printf("[DAO] %s 生成失败: %s\n", name, err.Error())
-					os.Exit(1)
+					return
 				}
 
-				err = base.MkdirAll(filepath.Dir(filename))
-				if err != nil {
-					fmt.Printf("[DAO] %s 目录创建失败: %s\n", name, err.Error())
-					os.Exit(1)
-				}
-
-				_, err = os.Stat(filename)
-				if err == nil && !force {
-					fmt.Printf("[DAO] %s 已存在，使用 --force 参数覆盖\n", name)
-					continue
-				}
-
-				err = os.WriteFile(filename, b, 0644)
-				if err != nil {
-					fmt.Printf("[DAO] %s 文件写入失败: %s\n", name, err.Error())
-					os.Exit(1)
-				}
-
-				fmt.Printf("[DAO] %s 创建成功: %s\n", name, filename)
+				fmt.Printf("[DAO] %s 创建成功\n", name)
 			}
+
+			return
 		},
 	}
 
-	cmd.Flags().BoolVarP(&force, "force", "f", false, "覆盖已存在的文件")
-
 	return
+}
+
+func newEchoctxCmd(force bool) (cmd *cobra.Command) {
+	return &cobra.Command{
+		Use:               "echoctx [names]",
+		Short:             "新建数据访问对象模板",
+		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
+		Example: examples(
+			"nexa new echoctx Rider",
+			"nexa new echoctx Rider --force",
+		),
+		Args: isUpperStartArgs,
+		RunE: func(_ *cobra.Command, names []string) (err error) {
+			var g *gen.Gen
+			g, err = gen.New()
+			if err != nil {
+				return
+			}
+
+			for _, name := range names {
+				err = g.Generate(gen.PackageEchoctx, name, force, func(g *gen.Gen, c *base.CommonTemplateVariables) any {
+					return &base.EchoCtxTemplateVariables{
+						CommonTemplateVariables: c,
+						Name:                    name,
+					}
+				})
+				if err != nil {
+					return
+				}
+
+				fmt.Printf("[Echo Context] %s 创建成功\n", name)
+			}
+
+			return
+		},
+	}
 }

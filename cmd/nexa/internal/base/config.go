@@ -24,16 +24,20 @@ type Config struct {
 	RootDir        string `json:"-" yaml:"-"` // nexa 项目根目录
 	ConfigFileName string `json:"-" yaml:"-"` // 配置文件名称
 
-	EntPath   string `yaml:"entPath"`   // ent 目录，默认值：internal/infrastructure/ent
-	DaoPath   string `yaml:"daoPath"`   // 数据访问对象目录，默认值：internal/infrastructure/dao
 	OrmClient string `yaml:"ormclient"` // ORM 客户端，默认值：ent.Database
+
+	EntPath     string `yaml:"entPath"`     // ent 目录，默认值：internal/infrastructure/ent
+	DaoPath     string `yaml:"daoPath"`     // 数据访问对象目录，默认值：internal/infrastructure/dao
+	EchoctxPath string `yaml:"echoctxPath"` // Echo 上下文目录，默认值：internal/app/rest/app
 }
 
 func defaultConfig() *Config {
 	return &Config{
-		EntPath:   "internal/infrastructure/ent",
-		DaoPath:   "internal/infrastructure/dao",
 		OrmClient: "ent.Database",
+
+		EntPath:     "internal/infrastructure/ent",
+		DaoPath:     "internal/infrastructure/dao",
+		EchoctxPath: "internal/app/rest/app",
 	}
 }
 
