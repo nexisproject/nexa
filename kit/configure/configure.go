@@ -59,8 +59,9 @@ type Logger struct {
 }
 
 type LoggerKafka struct {
-	Topic   string
-	Brokers []string
+	Disable bool     // 是否禁用kafka日志输出
+	Topic   string   // kafka topic
+	Brokers []string // kafka brokers
 }
 
 func (l *Logger) IsVaild() (vaild bool) {
@@ -68,8 +69,8 @@ func (l *Logger) IsVaild() (vaild bool) {
 		return
 	}
 
-	// 如果没有配置kafka和stdout，返回false
-	if !l.Stdout && l.Kafka == nil {
+	// 如果没有配置 stdout 和 kafka / kafka未启用，则无效
+	if !l.Stdout && l.Kafka == nil && l.Kafka.Disable {
 		return
 	}
 

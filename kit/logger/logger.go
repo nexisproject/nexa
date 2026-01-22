@@ -35,7 +35,7 @@ func Setup(cfg *configure.Logger) {
 	}
 
 	// 判断是否需要输出到Kafka
-	if cfg.Kafka != nil && len(cfg.Kafka.Brokers) > 0 {
+	if cfg.Kafka != nil && len(cfg.Kafka.Brokers) > 0 && !cfg.Kafka.Disable {
 		// Kafka输出配置使用JSON格式 - 明确使用不同的配置
 		kafkaEncoderConfig := zap.NewProductionEncoderConfig()
 		kafkaEncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
