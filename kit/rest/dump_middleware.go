@@ -222,10 +222,11 @@ func (mw *DumpZapLoggerMiddleware) WithConfig(cfg *DumpConfig) echo.MiddlewareFu
 		}
 
 		fields := []zap.Field{
+			zap.Int("dump", 1),
 			zap.String("method", c.Request().Method),
 			zap.String("url", c.Request().RequestURI),
 			zap.Int8("received", DumpReceivedRestServer),
-			zap.String("remote_addr", c.Request().RemoteAddr),
+			zap.String("remote_addr", c.RealIP()),
 		}
 
 		// log request header
