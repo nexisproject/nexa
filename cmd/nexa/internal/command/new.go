@@ -6,12 +6,14 @@ package command
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/cobra"
 
 	"nexis.run/nexa/cmd/nexa/internal/base"
 	"nexis.run/nexa/cmd/nexa/internal/gen"
+	"nexis.run/nexa/cmd/nexa/internal/parser"
 )
 
 func NewCmd() (*cobra.Group, *cobra.Command) {
@@ -42,6 +44,10 @@ func NewCmd() (*cobra.Group, *cobra.Command) {
 }
 
 func newDaoCmd(force bool) (cmd *cobra.Command) {
+	var (
+		di bool
+	)
+
 	cmd = &cobra.Command{
 		Use:               "dao [names]",
 		Short:             "新建数据访问对象模板",
@@ -62,7 +68,7 @@ func newDaoCmd(force bool) (cmd *cobra.Command) {
 				err = g.Generate(gen.PackageDao, name, force, func(g *gen.Gen, c *base.CommonTemplateVariables) any {
 					return &base.DaoTemplateVariables{
 						CommonTemplateVariables: c,
-						EntPkgImport:            base.GetPkgImport(g.Module, g.Config.RootDir, g.Config.EntPath),
+						EntPkgImport:            g.Config.GetEntImport(),
 						NameLower:               strings.ToLower(name),
 						Name:                    name,
 						OrmClient:               g.Config.OrmClient,
@@ -73,11 +79,36 @@ func newDaoCmd(force bool) (cmd *cobra.Command) {
 				}
 
 				fmt.Printf("[DAO] %s 创建成功\n", name)
+
+				if di {
+					diPath, _ := g.Config.GetDIPath()
+
+					var provider *parser.DaoProvider
+					provider, err = parser.NewDaoProvider(diPath, g.Config.DI.DaoStructName, g.Config.DI.DaoProviderSetVar, g.Config.GetDaoImport())
+					if err != nil {
+						fmt.Printf("[DAO] DI 代码生成器初始化失败: %v\n", err)
+						os.Exit(1)
+					}
+
+					// 添加字段
+					provider.AddField(name)
+
+					// 写入文件
+					err = provider.WriteToFile()
+					if err != nil {
+						fmt.Printf("[DAO] DI 代码生成失败: %v\n", err)
+						os.Exit(1)
+					}
+
+					fmt.Printf("[DAO] DI 更新成功: %s\n", diPath)
+				}
 			}
 
 			return
 		},
 	}
+
+	cmd.Flags().BoolVarP(&di, "di", "d", true, "生成依赖注入相关代码")
 
 	return
 }

@@ -20,6 +20,7 @@ var (
 
 type Config struct {
 	cfgPath string
+	module  string
 
 	RootDir        string `json:"-" yaml:"-"` // nexa 项目根目录
 	ConfigFileName string `json:"-" yaml:"-"` // 配置文件名称
@@ -29,6 +30,14 @@ type Config struct {
 	EntPath     string `yaml:"entPath"`     // ent 目录，默认值：internal/infrastructure/ent
 	DaoPath     string `yaml:"daoPath"`     // 数据访问对象目录，默认值：internal/infrastructure/dao
 	EchoctxPath string `yaml:"echoctxPath"` // Echo 上下文目录，默认值：internal/app/rest/app
+
+	DI DI `yaml:"di"` // 依赖注入配置
+}
+
+type DI struct {
+	Path              string `yaml:"path"`              // 依赖注入生成文件路径，默认值：internal/di/di.go
+	DaoProviderSetVar string `yaml:"daoProviderSetVar"` // Dao 提供者集合变量名称，默认值：daoProviderSet
+	DaoStructName     string `yaml:"daoStructName"`     // Dao 结构体名称，默认值：Dao
 }
 
 func defaultConfig() *Config {
@@ -38,6 +47,12 @@ func defaultConfig() *Config {
 		EntPath:     "internal/infrastructure/ent",
 		DaoPath:     "internal/infrastructure/dao",
 		EchoctxPath: "internal/app/rest/app",
+
+		DI: DI{
+			Path:              "internal/di/di.go",
+			DaoProviderSetVar: "daoProviderSet",
+			DaoStructName:     "Dao",
+		},
 	}
 }
 
@@ -50,23 +65,24 @@ func DefaultConfig() string {
 
 // 读取 YAML 配置文件。如果路径为空，则使用当前工作目录下的 ".nexa.yaml"。
 func loadConfig(cfgPath string) (*Config, error) {
+	c := defaultConfig()
+
 	// 读取配置文件，解析到 Config 结构体
 	b, err := os.ReadFile(cfgPath)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return defaultConfig(), nil
+			return c, nil
 		}
 
 		return nil, fmt.Errorf("配置文件读取失败: %v\n", err)
 	}
 
-	var value Config
-	err = yaml.Unmarshal(b, &value)
+	err = yaml.Unmarshal(b, c)
 	if err != nil {
 		return nil, fmt.Errorf("配置文件解析失败: %v\n", err)
 	}
 
-	return &value, nil
+	return c, nil
 }
 
 // InitializeConfig 初始化配置文件，如果配置文件不存在，则使用默认配置
@@ -77,12 +93,21 @@ func InitializeConfig(cfgPath string) (err error) {
 		return
 	}
 
+	value.cfgPath = cfgPath
+	value.ConfigFileName = filepath.Base(cfgPath)
+
+	value.RootDir, err = filepath.Abs(filepath.Dir(cfgPath))
+	if err != nil {
+		return
+	}
+
+	value.module, err = GetModule(filepath.Dir(cfgPath))
+	if err != nil {
+		return
+	}
+
 	cfgOnce.Do(func() {
 		cfg = value
-		cfg.cfgPath = cfgPath
-		cfg.ConfigFileName = filepath.Base(cfgPath)
-
-		cfg.RootDir, _ = filepath.Abs(filepath.Dir(cfgPath))
 	})
 
 	return
@@ -115,4 +140,24 @@ func (c *Config) GetEntPath() (string, error) {
 
 func (c *Config) GetDaoPath() (string, error) {
 	return c.getAbsPath(c.DaoPath)
+}
+
+func (c *Config) GetDIPath() (string, error) {
+	return c.getAbsPath(c.DI.Path)
+}
+
+func (c *Config) GetModule() string {
+	return c.module
+}
+
+func (c *Config) GetPkgImport(p string) string {
+	return GetPkgImport(c.module, c.RootDir, p)
+}
+
+func (c *Config) GetEntImport() string {
+	return c.GetPkgImport(c.EntPath)
+}
+
+func (c *Config) GetDaoImport() string {
+	return c.GetPkgImport(c.DaoPath)
 }

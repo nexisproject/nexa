@@ -33,7 +33,7 @@ func New() (gen *Gen, err error) {
 		return
 	}
 
-	gen.Module, err = base.GetModule(gen.Config.RootDir)
+	gen.Module = gen.Config.GetModule()
 	return
 }
 
