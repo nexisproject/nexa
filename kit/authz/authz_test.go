@@ -20,7 +20,7 @@ import (
 var (
 	testAddress       = ":18001"
 	allowedPermission = "allowed_permission"
-	existingProject   = "moneta-manage"
+	existingProject   = "MONETA_MANAGE"
 	testToken         = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjaWQiOiIiLCJleHAiOjE3NjE3Mjk3MTYsImlzcyI6IuaegeWFieWHuuihjCIsInByb2plY3RDb2RlIjpbInByb21vdGlvbi1tYW5hZ2UiLCJyZXBlcnRvcnktbWFuYWdlIiwic3NvLW1hbmFnZSIsInNnai1tYW5hZ2UiLCJkYXNoYm9hcmQtbWFuYWdlIl0sInN1YiI6Imx4ZiIsInVpZCI6NTd9.VPMRiKTwlu8p9qndYAhyYMZTrk2-Wrv9PV3QfPCD8nM"
 	testUid           = "test_uid"
 )
@@ -31,7 +31,7 @@ type testServer struct {
 
 func (*testServer) GetRestrictedUser(_ context.Context, req *rbac.GetRestrictedUserRequest) (*rbac.GetRestrictedUserResponse, error) {
 	hasPermission := req.PermissionKey == allowedPermission
-	hasUser := req.ProjectCode.GetRaw() == existingProject
+	hasUser := req.ProjectCode.String() == existingProject
 
 	var user *rbac.User
 	if hasUser {
