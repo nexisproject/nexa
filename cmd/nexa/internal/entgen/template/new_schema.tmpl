@@ -28,7 +28,7 @@ func ({{ . }}) Fields() []ent.Field {
 }
 
 // Indexes of the {{ . }}.
-func ({{ .name }}) Indexes() []ent.Index {
+func ({{ . }}) Indexes() []ent.Index {
     return []ent.Index{}
 }
 
@@ -38,9 +38,9 @@ func ({{ . }}) Edges() []ent.Edge {
 }
 
 // Mixin of the {{ . }}.
-func ({{ .name }}) Mixin() []ent.Mixin {
+func ({{ . }}) Mixin() []ent.Mixin {
     return []ent.Mixin{
         entx.TimeMixin{},
-        entx.DeleteMixin{},
+        entx.SoftDeleteMixin{},
     }
 }

@@ -68,7 +68,7 @@ func newDaoCmd(force bool) (cmd *cobra.Command) {
 				err = g.Generate(gen.PackageDao, name, force, func(g *gen.Gen, c *base.CommonTemplateVariables) any {
 					return &base.DaoTemplateVariables{
 						CommonTemplateVariables: c,
-						EntPkgImport:            g.Config.GetEntImport(),
+						EntPkgImport:            g.Config.GetEntPkgPath(),
 						NameLower:               strings.ToLower(name),
 						Name:                    name,
 						OrmClient:               g.Config.OrmClient,
@@ -84,7 +84,7 @@ func newDaoCmd(force bool) (cmd *cobra.Command) {
 					diPath, _ := g.Config.GetDIPath()
 
 					var provider *parser.DaoProvider
-					provider, err = parser.NewDaoProvider(diPath, g.Config.DI.DaoStructName, g.Config.DI.DaoProviderSetVar, g.Config.GetDaoImport())
+					provider, err = parser.NewDaoProvider(diPath, g.Config.DI.DaoStructName, g.Config.DI.DaoProviderSetVar, g.Config.GetDaoPkgPath())
 					if err != nil {
 						fmt.Printf("[DAO] DI 代码生成器初始化失败: %v\n", err)
 						os.Exit(1)

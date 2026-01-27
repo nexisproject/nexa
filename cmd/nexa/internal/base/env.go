@@ -24,8 +24,8 @@ func GetYear() string {
 	return strconv.Itoa(time.Now().Year())
 }
 
-// GetPkgImport 获取包的 import 路径
-func GetPkgImport(module, root, path string) string {
+// GetPkgPath 获取包的 import 路径
+func GetPkgPath(module, root, path string) string {
 	adir, _ := filepath.Abs(root)
 
 	apath := path

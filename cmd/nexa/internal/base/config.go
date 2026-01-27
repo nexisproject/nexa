@@ -27,7 +27,10 @@ type Config struct {
 
 	OrmClient string `yaml:"ormclient"` // ORM 客户端，默认值：ent.Database
 
-	EntPath     string `yaml:"entPath"`     // ent 目录，默认值：internal/infrastructure/ent
+	EntPath      string   `yaml:"entPath"`      // ent 目录，默认值：internal/infrastructure/ent
+	EntTemplates []string `yaml:"entTemplates"` // ent 代码生成模板目录
+	EntFeatures  []string `yaml:"entFeatures"`  // ent 代码生成特性
+
 	DaoPath     string `yaml:"daoPath"`     // 数据访问对象目录，默认值：internal/infrastructure/dao
 	EchoctxPath string `yaml:"echoctxPath"` // Echo 上下文目录，默认值：internal/app/rest/app
 
@@ -126,7 +129,7 @@ func (c *Config) GetConfigFilePath() string {
 	return c.cfgPath
 }
 
-func (c *Config) getAbsPath(p string) (string, error) {
+func (c *Config) GetAbsPath(p string) (string, error) {
 	if filepath.IsAbs(p) {
 		return p, nil
 	}
@@ -135,29 +138,29 @@ func (c *Config) getAbsPath(p string) (string, error) {
 }
 
 func (c *Config) GetEntPath() (string, error) {
-	return c.getAbsPath(c.EntPath)
+	return c.GetAbsPath(c.EntPath)
 }
 
 func (c *Config) GetDaoPath() (string, error) {
-	return c.getAbsPath(c.DaoPath)
+	return c.GetAbsPath(c.DaoPath)
 }
 
 func (c *Config) GetDIPath() (string, error) {
-	return c.getAbsPath(c.DI.Path)
+	return c.GetAbsPath(c.DI.Path)
 }
 
 func (c *Config) GetModule() string {
 	return c.module
 }
 
-func (c *Config) GetPkgImport(p string) string {
-	return GetPkgImport(c.module, c.RootDir, p)
+func (c *Config) GetPkgPath(p string) string {
+	return GetPkgPath(c.module, c.RootDir, p)
 }
 
-func (c *Config) GetEntImport() string {
-	return c.GetPkgImport(c.EntPath)
+func (c *Config) GetEntPkgPath() string {
+	return c.GetPkgPath(c.EntPath)
 }
 
-func (c *Config) GetDaoImport() string {
-	return c.GetPkgImport(c.DaoPath)
+func (c *Config) GetDaoPkgPath() string {
+	return c.GetPkgPath(c.DaoPath)
 }

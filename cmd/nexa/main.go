@@ -46,15 +46,18 @@ func main() {
 
 	configGroup, configCommand := command.ConfigCmd()
 	createGroup, createCommand := command.NewCmd()
+	entGroup, entCommand := command.EntCmd()
 
 	cmd.AddGroup(
 		configGroup,
 		createGroup,
+		entGroup,
 	)
 
 	cmd.AddCommand(
 		configCommand,
 		createCommand,
+		entCommand,
 	)
 
 	cmd.PersistentFlags().StringVarP(&configFile, "config", "c", ".nexa.yaml", "配置文件")
