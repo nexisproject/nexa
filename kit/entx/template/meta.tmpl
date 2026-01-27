@@ -1,0 +1,36 @@
+{{/* gotype: entgo.io/ent/entc/gen.Type*/}}
+
+{{ define "meta/additional" }}
+
+const (
+{{- if $.HasOneFieldID }}
+    // {{ $.ID.Constant }} holds the string denoting the id field in the database.
+    Order{{ $.ID.Constant }} = "{{ $.ID.StorageKey }}"
+{{- end }}
+{{- range $f := $.Fields }}
+    {{- $field := $f.Constant }}
+    // {{ $field }} holds the string denoting the {{ lower $f.Name }} field in the database.
+    Order{{ $field }} = "{{ camel $f.StorageKey }}"
+{{- end }}
+)
+
+var OrderFields = map[string]string{
+{{- if $.HasOneFieldID }}
+    {{ $.ID.Constant }}: Order{{ $.ID.Constant }},
+{{- end }}
+{{- range $f := $.Fields }}
+    {{- $field := $f.Constant }}
+    {{ $field }}: Order{{ $field }},
+{{- end }}
+}
+
+// GetOrderFields returns the order fields by the given field names.
+func GetOrderFields(field string) (orderFields map[string]string) {
+    orderFields = make(map[string]string)
+    if v, ok := OrderFields[field]; ok {
+        orderFields[v] = field
+    }
+    return
+}
+
+{{ end }}

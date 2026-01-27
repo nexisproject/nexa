@@ -1,0 +1,27 @@
+{{/* gotype: entgo.io/ent/entc/gen.Type */}}
+
+{{ define "dialect/sql/create_bulk/additional/upsert" }}
+
+{{ $pkg := base $.Config.Package }}
+{{ $builder := pascal $.Scope.Builder }}
+{{ $receiver := $.Scope.Receiver }}
+{{ $upsertOne := print $.Name "UpsertOne" }}
+{{ $upsertSet := print $.Name "Upsert" }}
+
+// Save creates the {{ $.Name }} in the database.
+func (u *{{ $upsertOne }}) Save(ctx context.Context) (*{{ $.Name }}, error) {
+    if len(u.create.conflict) == 0 {
+        return nil, errors.New("{{ $pkg }}: missing options for {{ $builder }}.OnConflict")
+    }
+    return u.create.Save(ctx)
+}
+
+// SaveX calls Save and panics if Save returns an error.
+func (u *{{ $upsertOne }}) SaveX(ctx context.Context) *{{ $.Name }} {
+    v, err := u.Save(ctx)
+    if err != nil {
+        panic(err)
+    }
+    return v
+}
+{{ end }}
