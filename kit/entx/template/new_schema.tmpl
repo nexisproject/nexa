@@ -1,0 +1,46 @@
+package schema
+
+import (
+    "entgo.io/ent"
+    "entgo.io/ent/dialect/entsql"
+    "entgo.io/ent/schema"
+    "nexis.run/nexa/kit/entx"
+)
+
+// {{ . }} holds the schema definition for the {{ . }} entity.
+type {{ . }} struct {
+    ent.Schema
+}
+
+// Annotations of the {{ . }}.
+func ({{ . }}) Annotations() []schema.Annotation {
+    return []schema.Annotation{
+        entsql.Annotation{Table: "{{ snake . }}"},
+        entsql.WithComments(true),
+        schema.Comment(),
+    }
+}
+
+// Fields of the {{ . }}.
+func ({{ . }}) Fields() []ent.Field {
+    return []ent.Field {
+    }
+}
+
+// Indexes of the {{ . }}.
+func ({{ .name }}) Indexes() []ent.Index {
+    return []ent.Index{}
+}
+
+// Edges of the {{ . }}.
+func ({{ . }}) Edges() []ent.Edge {
+    return nil
+}
+
+// Mixin of the {{ . }}.
+func ({{ .name }}) Mixin() []ent.Mixin {
+    return []ent.Mixin{
+        entx.TimeMixin{},
+        entx.DeleteMixin{},
+    }
+}
