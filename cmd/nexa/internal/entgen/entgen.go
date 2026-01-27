@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	genFile = "package ent\n\n//go:generate go run -mod=mod entgo.io/ent/cmd/ent generate ./schema\n"
+	genFile = "package ent\n\n//go:generate go run -mod=mod nexis.run/nexa@master ent generate\n"
 )
 
 type EntGen struct {
