@@ -69,6 +69,9 @@ func (r *Response) SetParams(params ...any) *Response {
 				message = fmt.Sprintf("%v", he.Message)
 			}
 			r.SetMessage(message)
+			if r.Code == http.StatusOK {
+				r.SetCode(http.StatusBadRequest)
+			}
 		default:
 			if r.Data == nil {
 				r.SetData(v)
